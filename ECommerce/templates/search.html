@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% load bootstrap4 %}
+    {% load static %}
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<form method="get" action="{% url 'search' %}" class="search_search">
+    <div class="input-group">
+        <input type="text" class="form-control" name="str" placeholder="Search..." value="{{ search_string }}" >
+        <div class="input-group-append">
+            <button class="btn btn-info" type="submit">搜索</button>
+        </div>
+    </div>
+</form>
+<div class="search_table">
+ <table class="table">
+        <tr>
+            <td nowrap>综合</td>
+            <td nowrap>销量</td>
+            <td nowrap>评价数</td>
+            <td nowrap>
+                {% if sort == '1' %}
+                    <a href="?str={{ search_string }}&sort=2&page=1">价格</a>
+                {% else %}
+                    <a href="?str={{ search_string }}&sort=1&page=1">价格</a>
+                {% endif %}
+            </td>
+            <td width="100%" align="right"></td>
+            <td width="100%">
+                {% if products.has_previous %}
+                    <a href="?str={{ search_string }}&sort={{ sort }}&page={{ products.previous_page_number }}"><</a>
+                {% else %}
+                    <a><</a>
+                {% endif %}
+            </td>
+            <td width="100%"><span>{{ products.number }}/{{ max_page }}</span></td>
+            <td width="100%">
+                {% if products.has_next %}
+                    <a href="?str={{ search_string }}&sort={{ sort }}&page={{ products.next_page_number }}">></a>
+                {% else %}
+                    <a>></a>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+<div class="search_table">
+
+    <table class="table">
+        <tr>
+            <th>图片</th>
+            <th>标题</th>
+            <th>商品名称</th>
+            <th>卖家名称</th>
+            <th>ID</th>
+            <th>品牌</th>
+            <th>价格</th>
+            <th>Platform</th>
+            <th>URL</th>
+        </tr>
+        {% for product in products.object_list %}
+            <tr>
+                <td>
+                    {% if product.image_url %}
+                        <img src="{{ product.image_url }}" width="50px" alt="">
+                    {% else %}
+                        <img src="{% static 'img/image_not_found.jpg' %}" width="50px" alt="">
+                    {% endif %}
+                </td>
+                <td>{{ product.title }}</td>
+                <td>{{ product.product_name }}</td>
+                <td>
+                    {% if product.shop_name %}
+                        {{ product.shop_name }}
+                    {% else %}
+                       -
+                    {% endif %}
+                </td>
+                <td>{{ product.product_id }}</td>
+                <td>{{ product.brand }}</td>
+                <td>{{ product.price }}</td>
+                <td>{{ product.platform }}</td>
+                <td><a href="{{ product.product_url }}">{{ product.product_url }}</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>

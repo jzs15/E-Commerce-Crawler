@@ -1,3 +1,6 @@
-from django.db import models
+from mongoengine import *
 
-# Create your models here.
+
+class Product(Document):
+    title = StringField()
+    product_name = StringField()

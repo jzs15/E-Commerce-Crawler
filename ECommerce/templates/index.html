@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% load bootstrap4 %}
+    {% load static %}
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+<div class="index_search">
+    <form method="get" action="{% url 'search' %}">
+        <input type="text" class="form-control" name="str" placeholder="Search..." >
+    </form>
+</div>
+</body>
+</html>

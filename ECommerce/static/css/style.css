@@ -1,0 +1,34 @@
+.index_search{
+    height: 40em;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.search_search{
+    height: 5em;
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.index_search form{
+    width: 40%;
+    margin: 0;
+}
+
+.search_search .input-group{
+    width: 60%;
+    margin: 0;
+}
+
+.search_table{
+    display: flex;
+    align-items: center;
+    justify-content: center
+}
+
+.search_table table{
+    width: 90%;
+    margin: 0;
+}
