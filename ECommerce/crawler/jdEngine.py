@@ -164,9 +164,9 @@ class JDEngine:
             ids = root.xpath('//li[@class="gl-item"]//div[@class="gl-i-wrap j-sku-item"]/@data-sku')
             for j in range(len(ids)):
                 info = self.get_common_info(re.sub('\s', '', ids[j]), spider)
-                self.add_to_db(info, model)
+                self.save_to_db(info, model)
 
-    def add_to_db(self, info, model):
+    def save_to_db(self, info, model):
         if not self.isConnected:
             connect(DATABASE_NAME)
             self.isConnected = True

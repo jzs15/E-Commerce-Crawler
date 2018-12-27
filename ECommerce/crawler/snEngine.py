@@ -2,11 +2,10 @@ import requests
 import lxml.html
 import time
 from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-import urllib.request
 from ECommerce.settings import DATABASE_NAME
 from app.models import *
 from mongoengine import *
+
 
 class SDEngine:
     def __init__(self):
@@ -16,15 +15,17 @@ class SDEngine:
         self.html = ".html"
         self.product_page = "https://product.suning.com/"
         self.id_list = list()
-        self.info_list = ['image', 'title', 'price', 'comment_num', 'score', 'brand', 'model', 'date', 'shop_name', 'os', 'cpu', 'ram', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support', 'url']
-
+        self.info_list = ['image', 'title', 'price', 'comment_num', 'score', 'brand', 'model', 'date', 'shop_name',
+                          'os', 'cpu', 'ram', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency',
+                          'color', 'network_support', 'url']
 
     def get_page_num(self):
         res = requests.get(self.suning_url + self.category + "0" + self.html)
         etree = lxml.html.etree
         root = etree.HTML(res.text)
-        self.page_num = int(root.xpath('//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[-1].attrib['pagenum'])
-
+        self.page_num = int(root.xpath(
+            '//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[
+                                -1].attrib['pagenum'])
 
     def get_id_list(self):
         driver = webdriver.Chrome()
@@ -37,21 +38,23 @@ class SDEngine:
             for id in list:
                 self.id_list.append(id.get_attribute('id').replace('-', '/'))
 
-
     def init_dict(self, m_dict):
         for i in self.info_list:
             m_dict[i] = 'None'
         m_dict['platform'] = '苏宁'
 
 
-    def save_to_db(self, m_dict):
-        if not self.is_connect:
+    def save_to_db(self, m_dict, model):
+        if not self.isConnected:
             connect(DATABASE_NAME)
-            self.is_connect = True
-        product = Product(**m_dict)
-        product.save()
-        return
+            self.isConnected = True
 
+        products = model.objects.filter(url=m_dict['url'])
+        if products.first() is None:
+            product = model(**m_dict)
+            product.save()
+        else:
+            products.update(**m_dict)
 
     def get_information(self):
         self.init_dict(m_dict)
@@ -69,14 +72,16 @@ class SDEngine:
             m_dict['image'] = driver.find_element_by_id('bigImg').find_element_by_xpath('.//img').get_attribute('src')
             m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text
             m_dict['price'] = float(driver.find_element_by_class_name('mainprice').text.replace('¥', ''))
-            m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath('.//a').get_attribute('innerHTML')
+            m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath(
+                './/a').get_attribute('innerHTML')
 
             comment = driver.find_element_by_css_selector("[class='rv-place-item clearfix']")
             score = 5 * int(
                 comment.find_element_by_xpath(".//li[@data-type='good']").get_attribute('data-num')) + 3 * int(
                 comment.find_element_by_xpath(".//li[@data-type='normal']").get_attribute('data-num')) + int(
                 comment.find_element_by_xpath(".//li[@data-type='bad']").get_attribute('data-num'))
-            m_dict['comment_num'] = int(comment.find_element_by_xpath(".//li[@data-type='total']").get_attribute('data-num'))
+            m_dict['comment_num'] = int(
+                comment.find_element_by_xpath(".//li[@data-type='total']").get_attribute('data-num'))
             m_dict['score'] = score / m_dict['comment_num']
 
             try:
@@ -96,7 +101,7 @@ class SDEngine:
                             date = date.replace('年', '')
                         if '.' in date:
                             index = date.find('.')
-                            date = date[:index+1] + '0' + date[index+1:]
+                            date = date[:index + 1] + '0' + date[index + 1:]
                         m_dict['date'] = date
                     elif name == '手机操作系统':
                         m_dict['os'] = item[i].get_attribute('innerHTML')
@@ -119,19 +124,33 @@ class SDEngine:
                     elif name == '颜色':
                         m_dict['color'] = item[i].get_attribute('innerHTML')
                     elif name == '4G网络制式':
-                        m_dict['network_support'] = item[i].get_attribute('innerHTML')
+                        m_dict['network_support'] = self.get_network_info(item[i].get_attribute('innerHTML'))
             except:
                 continue
             self.save_to_db(m_dict)
 
+    def get_network_info(self, net):
+        if net:
+            china_mobile = net.find("移动") >= 0
+            china_unicom = net.find("联通") >= 0
+            china_telecom = net.find("电信") >= 0
+            all_kind = (china_mobile and china_unicom and china_telecom) or net.find("全网通") >= 0
+        else:
+            china_mobile = False
+            china_unicom = False
+            china_telecom = False
+            all_kind = False
+        return {'china_mobile': china_mobile, 'china_unicom': china_unicom, 'china_telecom': china_telecom,
+                'all_kind': all_kind}
+
 
 def main():
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
+    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     SDcrawler = SDEngine()
     SDcrawler.get_page_num()
     SDcrawler.get_id_list()
     SDcrawler.get_information()
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
+    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
 
 m_dict = dict()
