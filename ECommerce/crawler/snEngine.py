@@ -137,11 +137,17 @@ class SDEngine:
             crawler = self.cellphone_crawler
             model = Cellphone
         id_list = self.get_id_list(page_num, category)
+        print(len(id_list))
         info = dict()
         driver = webdriver.Chrome()
+        num = 1
         for id in id_list:
             self.init_dict(info)
             url = "https://product.suning.com/" + id + ".html"
+            print(num)
+            num += 1
+            print(url)
+
             info['url'] = url
             driver.get(url)
             self.load_data(driver)
