@@ -28,7 +28,6 @@ class SDEngine:
 
     def get_id_list(self):
         driver = webdriver.Chrome()
-        self.page_num = 1
         for page in range(self.page_num):
             driver.get(self.suning_url + self.category + str(page) + self.html)
             for i in range(7):
@@ -58,7 +57,6 @@ class SDEngine:
         self.init_dict(m_dict)
         driver = webdriver.Chrome()
         num = 1
-        self.id_list = ['0000000000/945031937']
         for id in self.id_list:
             print(num)
             num += 1
@@ -133,8 +131,8 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
     SDcrawler = SDEngine()
-    #SDcrawler.get_page_num()
-    #SDcrawler.get_id_list()
+    SDcrawler.get_page_num()
+    SDcrawler.get_id_list()
     SDcrawler.get_information()
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
 
