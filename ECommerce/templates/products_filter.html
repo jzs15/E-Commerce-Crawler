@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+    {% load bootstrap4 %}
+    {% load static %}
+    {% bootstrap_css %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <script type="text/javascript" src="{% static 'js/products_filter.js' %}">
+    </script>
+</head>
+<body class="gray_body">
+<div class="filter_table">
+    <p>共找到相关商品{{ total_result }}件</p>
+</div>
+<div class="filter_table filter_head">
+    <table class="table">
+        <tr>
+            {% if filtered %}
+                <th width="10%">
+                    您已选择：
+                </th>
+                <td>
+                    {% for name_cn, name_en, value in filtered %}
+                        <div class="filtered">{{ name_cn }}:<a href="#"
+                                                               onclick="RemoveFilter('{{ name_en }}')">{{ value }}x</a>
+                        </div>
+                    {% endfor %}
+                </td>
+            {% else %}
+                <th width="10%">
+                    筛选商品
+                </th>
+            {% endif %}
+        </tr>
+        {% for name_cn, name_en, values in filter_list %}
+            <tr>
+                <th width="10%">
+                    {{ name_cn }}：
+                </th>
+                <td>
+                    {% for value in values %}
+                        <a href="#" onclick="AddFilter('{{ name_en }}', '{{ value }}')">{{ value }}</a>
+                    {% endfor %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+<div class="filter_table">
+    <table class="table">
+        <tr>
+            <td colspan="4">
+                <div class="btn-group" role="group" aria-label="Basic example" data-toggle="buttons">
+                    <button type="button" class="btn btn-outline-info btn-sm">默认排序</button>
+                    <button type="button" class="btn btn-outline-info btn-sm">价格↓</button>
+                    <button type="button" class="btn btn-outline-info btn-sm">销量↓</button>
+                    <button type="button" class="btn btn-outline-info btn-sm">时间↓</button>
+                </div>
+            </td>
+            <td>
+                <div class="total">共<b>{{ total_result }}</b>款</div>
+            </td>
+            <td>
+                <div style="float: right;">
+                    {% if products.has_previous %}
+                        <a href="#" onclick="EditPage('{{ products.previous_page_number }}')">&laquo;</a>
+                    {% else %}
+                        <a>&laquo;</a>
+                    {% endif %}
+                    <span>{{ products.number }}/{{ max_page }}</span>
+                    {% if products.has_next %}
+                        <a href="#" onclick="EditPage('{{ products.next_page_number }}')">&raquo;</a>
+                    {% else %}
+                        <a>&raquo;</a>
+                    {% endif %}
+                </div>
+            </td>
+        </tr>
+        {% for product in products.object_list %}
+            <tr>
+                <td>
+                    <img src="{{ product.image_url }}" width="160px" alt="">
+                </td>
+                <td>
+                    <p><a href="/compare/{{ product.id }}">{{ product.name }}</a></p>
+                    <p>{{ product.title }}</p>
+                </td>
+                <td class="price">
+                    <p style="float: right;">¥{{ product.price }}</p>
+                </td>
+                <td width="15%">
+                    <p style="float: right;">
+                        有{{ product.eval_total }}人评论</p>
+                </td>
+                <td width="20%" colspan="2">
+                    {% if product.platform == 'JD' %}
+                        <p style="float: right;"><img src="{% static 'img/jd.ico' %}" alt="" width="15px">京东商城</p>
+                    {% endif %}
+                    <p style="float: right;">{{ product.shop_name }}</p>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+</body>
+</html>
