@@ -16,7 +16,7 @@ class SDEngine:
         self.html = ".html"
         self.product_page = "https://product.suning.com/"
         self.id_list = list()
-        self.info_list = ['image', 'title', 'price', 'comment_num', 'score', 'company', 'model', 'date', 'os', 'cpu', 'ram', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support', 'url']
+        self.info_list = ['image', 'title', 'price', 'comment_num', 'score', 'brand', 'model', 'date', 'shop_name', 'os', 'cpu', 'ram', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support', 'url']
 
 
     def get_page_num(self):
@@ -56,11 +56,7 @@ class SDEngine:
     def get_information(self):
         self.init_dict(m_dict)
         driver = webdriver.Chrome()
-        num = 1
         for id in self.id_list:
-            print(num)
-            num += 1
-            print(self.product_page + id + self.html)
             m_dict['url'] = self.product_page + id + self.html
             driver.get(self.product_page + id + self.html)
             for i in range(10):
@@ -73,6 +69,7 @@ class SDEngine:
             m_dict['image'] = driver.find_element_by_id('bigImg').find_element_by_xpath('.//img').get_attribute('src')
             m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text
             m_dict['price'] = float(driver.find_element_by_class_name('mainprice').text.replace('¥', ''))
+            m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath('.//a').get_attribute('innerHTML')
 
             comment = driver.find_element_by_css_selector("[class='rv-place-item clearfix']")
             score = 5 * int(
@@ -88,7 +85,7 @@ class SDEngine:
                 for n, i in zip(para_name, range(len(para_name))):
                     name = n.find_element_by_xpath('.//div/span').get_attribute('innerHTML')
                     if name == '品牌':
-                        m_dict['company'] = item[i].find_element_by_xpath('.//a').get_attribute('innerHTML')
+                        m_dict['brand'] = item[i].find_element_by_xpath('.//a').get_attribute('innerHTML')
                     elif name == '型号':
                         m_dict['model'] = item[i].get_attribute('innerHTML')
                     elif name == '上市时间':

@@ -3,11 +3,12 @@ from mongoengine import *
 
 class Product(Document):
     title = StringField()
+    shop_name = StringField()
     image = StringField()
     price = DecimalField()
     comment_num = IntField()
     score = FloatField()
-    company = StringField()
+    brand = StringField()
     model = StringField()
     date = StringField()
     os = StringField()
