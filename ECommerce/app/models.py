@@ -29,6 +29,6 @@ class Cellphone(Product):
     cpu = StringField()
     ram = StringField()
     rom = StringField()
-    network = DictField()
     frequency = StringField()
     screen_size = StringField()
+    network_support = StringField()
