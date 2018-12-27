@@ -24,16 +24,16 @@
             <td nowrap>销量</td>
             <td nowrap>评价数</td>
             <td nowrap>
-                {% if sort == '1' %}
-                    <a href="?str={{ search_string }}&sort=2&page=1">价格</a>
+                {% if sort1 == '1' %}
+                    <a href="?str={{ search_string }}&sort1=2&page=1">价格</a>
                 {% else %}
-                    <a href="?str={{ search_string }}&sort=1&page=1">价格</a>
+                    <a href="?str={{ search_string }}&sort1=1&page=1">价格</a>
                 {% endif %}
             </td>
             <td width="100%" align="right"></td>
             <td width="100%">
                 {% if products.has_previous %}
-                    <a href="?str={{ search_string }}&sort={{ sort }}&page={{ products.previous_page_number }}"><</a>
+                    <a href="?str={{ search_string }}&sort1={{ sort1 }}&page={{ products.previous_page_number }}"><</a>
                 {% else %}
                     <a><</a>
                 {% endif %}
@@ -41,7 +41,7 @@
             <td width="100%"><span>{{ products.number }}/{{ max_page }}</span></td>
             <td width="100%">
                 {% if products.has_next %}
-                    <a href="?str={{ search_string }}&sort={{ sort }}&page={{ products.next_page_number }}">></a>
+                    <a href="?str={{ search_string }}&sort1={{ sort1 }}&page={{ products.next_page_number }}">></a>
                 {% else %}
                     <a>></a>
                 {% endif %}

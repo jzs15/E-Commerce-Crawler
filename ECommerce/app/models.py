@@ -3,24 +3,32 @@ from mongoengine import *
 
 class Product(Document):
     title = StringField()
-    shop_name = StringField()
-    image = StringField()
-    price = DecimalField()
-    comment_num = IntField()
-    score = FloatField()
-    brand = StringField()
     model = StringField()
+    shop_name = StringField()
+    brand = StringField()
+    platform = StringField()
+    price = DecimalField()
+    score = IntField()
+    comment_num = FloatField()
+    url = URLField(unique=True)
     date = StringField()
+    image = StringField()
+
+    meta = {
+        'allow_inheritance': True,
+    }
+
+
+class Cellphone(Product):
+    color = StringField()
+    weight = StringField()
+    thickness = StringField()
+    width = StringField()
+    height = StringField()
     os = StringField()
     cpu = StringField()
     ram = StringField()
-    height = StringField()
-    width = StringField()
-    thickness = StringField()
-    weight = StringField()
-    screen_size = StringField()
+    rom = StringField()
+    network = DictField()
     frequency = StringField()
-    color = StringField()
-    network_support = StringField()
-    platform = StringField()
-    url = URLField()
+    screen_size = StringField()
