@@ -7,7 +7,6 @@ class Product(Document):
     shop_name = StringField()
     brand = StringField()
     platform = StringField()
-    product_id = StringField()
     price = DecimalField()
     score = IntField()
     comment_num = FloatField()
@@ -17,7 +16,7 @@ class Product(Document):
 
     meta = {
         'indexes': [
-            {'fields': ('platform', 'product_id'), 'unique': True},
+            {'fields': ('url'), 'unique': True},
         ],
         'allow_inheritance': True,
     }
@@ -30,7 +29,7 @@ class Cellphone(Product):
     width = StringField()
     height = StringField()
     os = StringField()
-    cpu_brand = StringField()
+    cpu = StringField()
     ram = StringField()
     rom = StringField()
     network = DictField()
