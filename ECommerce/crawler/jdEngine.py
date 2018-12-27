@@ -44,7 +44,6 @@ class JDEngine:
         product_info['model'] = model
         product_info['date'] = self.get_date(root)
         product_info['price'] = self.get_price(product_id)
-        product_info['product_id'] = product_id
         product_info['platform'] = 'JD'
         product_info['url'] = url
         evaluation = self.get_evaluation(product_id)
@@ -140,7 +139,7 @@ class JDEngine:
         info['height'] = self.get_detail_info(root, '机身长度（mm）')
         info['width'] = self.get_detail_info(root, '机身宽度（mm）')
         info['os'] = self.get_detail_info(root, '操作系统')
-        info['cpu_brand'] = self.get_detail_info(root, 'CPU品牌')
+        info['cpu'] = self.get_detail_info(root, 'CPU品牌')
         info['ram'] = self.get_detail_info(root, 'RAM')
         info['rom'] = self.get_detail_info(root, 'ROM')
         info['frequency'] = self.get_detail_info(root, '分辨率')
@@ -172,8 +171,7 @@ class JDEngine:
             connect(DATABASE_NAME)
             self.isConnected = True
 
-        products = model.objects.filter(Q(platform=info['platform']) &
-                                          Q(product_id=info['product_id']))
+        products = model.objects.filter(url=info['url'])
         if products.first() is None:
             product = model(**info)
             product.save()

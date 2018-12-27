@@ -10,14 +10,11 @@ class Product(Document):
     price = DecimalField()
     score = IntField()
     comment_num = FloatField()
-    url = URLField()
+    url = URLField(unique=True)
     date = StringField()
     image = StringField()
 
     meta = {
-        'indexes': [
-            {'fields': ('url'), 'unique': True},
-        ],
         'allow_inheritance': True,
     }
 
