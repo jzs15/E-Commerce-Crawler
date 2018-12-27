@@ -28,7 +28,7 @@ class SDEngine:
 
     def get_id_list(self):
         driver = webdriver.Chrome()
-        for page in range(self.page_num):
+        for page in range(1):#self.page_num):
             driver.get(self.suning_url + self.category + str(page) + self.html)
             for i in range(7):
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
@@ -56,7 +56,12 @@ class SDEngine:
     def get_information(self):
         self.init_dict(m_dict)
         driver = webdriver.Chrome()
+        num = 1
+        self.id_list = ['0000000000/945048517']
         for id in self.id_list:
+            print(num)
+            num += 1
+            print(self.product_page + id + self.html)
             m_dict['url'] = self.product_page + id + self.html
             driver.get(self.product_page + id + self.html)
             for i in range(10):
@@ -67,9 +72,12 @@ class SDEngine:
                 time.sleep(5)
             infoMain = driver.find_element_by_class_name('proinfo-title')
             m_dict['image'] = driver.find_element_by_id('bigImg').find_element_by_xpath('.//img').get_attribute('src')
-            m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text
+            m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text.replace('自营', '').replace('\n', '')
             m_dict['price'] = float(driver.find_element_by_class_name('mainprice').text.replace('¥', ''))
-            m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath('.//a').get_attribute('innerHTML')
+            try:
+                m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath('.//a').get_attribute('innerHTML')
+            except:
+                m_dict['shop_name'] = 'None'
 
             comment = driver.find_element_by_css_selector("[class='rv-place-item clearfix']")
             score = 5 * int(
@@ -128,8 +136,9 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
     SDcrawler = SDEngine()
-    SDcrawler.get_page_num()
-    SDcrawler.get_id_list()
+    #SDcrawler.get_page_num()
+    #SDcrawler.get_id_list()
+    #print(len(SDcrawler.id_list))
     SDcrawler.get_information()
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
 
