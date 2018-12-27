@@ -114,7 +114,7 @@ class JDEngine:
                 date = year
                 month = month.replace('月', '')
                 if month.isnumeric():
-                    date += year + '.{:02d}'.format(int(month))
+                    date += '.{:02d}'.format(int(month))
         return date
 
     def get_network_info(self, root):
