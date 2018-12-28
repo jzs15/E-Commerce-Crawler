@@ -7,4 +7,4 @@ def remove_remark(string):
         i = string.find(find_str)
         if i != -1 and i < index:
             index = i
-    return string[:index].rstrip()
+    return string[:index].strip()
