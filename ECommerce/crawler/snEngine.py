@@ -8,10 +8,12 @@ from ECommerce.settings import DATABASE_NAME
 from app.models import *
 from mongoengine import *
 
+
 class SDEngine:
     def __init__(self):
         self.is_connect = False
-        self.info_list = ['image', 'title', 'price', 'comment_num', 'score', 'brand', 'model', 'date', 'shop_name', 'os', 'cpu', 'ram', 'rom', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support', 'url']
+        self.common_info_list = ['image', 'title', 'price', 'comment_num', 'score', 'shop_name', 'url']
+        self.cellphone_info_list = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
 
 
     def get_page_num(self, category):
@@ -25,10 +27,11 @@ class SDEngine:
         driver = webdriver.Chrome()
         id_list = list()
         for page in range(page_num):
+            print('page:', page)
             driver.get("https://list.suning.com/" + category + str(page) + ".html")
-            for i in range(7):
+            for i in range(10):
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(3)
+                time.sleep(1)
             ID_list = driver.find_element_by_id('product-list').find_elements_by_xpath(".//ul/li[@id]")
             for id in ID_list:
                 id_list.append(id.get_attribute('id').replace('-', '/'))
@@ -36,7 +39,9 @@ class SDEngine:
 
 
     def init_dict(self, m_dict):
-        for i in self.info_list:
+        for i in self.common_info_list:
+            m_dict[i] = 'None'
+        for i in self.cellphone_info_list:
             m_dict[i] = 'None'
         m_dict['platform'] = '苏宁'
 
@@ -136,18 +141,12 @@ class SDEngine:
         if category == '0-20002-':
             crawler = self.cellphone_crawler
             model = Cellphone
-        id_list = self.get_id_list(page_num, category)
-        print(len(id_list))
+        id_list = ['0000000000/945048517']#self.get_id_list(page_num, category)
         info = dict()
         driver = webdriver.Chrome()
-        num = 1
         for id in id_list:
             self.init_dict(info)
             url = "https://product.suning.com/" + id + ".html"
-            print(num)
-            num += 1
-            print(url)
-
             info['url'] = url
             driver.get(url)
             self.load_data(driver)
@@ -159,7 +158,9 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
     sd = SDEngine()
-    sd.crawling('0-20002-')
+    #sd.crawling('0-20002-')
+    id_list = sd.get_id_list(50, '0-20002-')
+    print(len(id_list))
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
 
 
