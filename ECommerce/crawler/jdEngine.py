@@ -138,7 +138,7 @@ class JDEngine:
         info['rom'] = self.get_detail_info(root, 'ROM')
         info['frequency'] = self.get_detail_info(root, '分辨率')
         info['screen_size'] = self.get_detail_info(root, '主屏幕尺寸（英寸）')
-        info['network'] = self.get_network_info(root)
+        info['network_support'] = self.get_network_info(root)
         info['weight'] = remove_remark(self.get_detail_info(root, '机身重量（g）'))
         info['thickness'] = remove_remark(self.get_detail_info(root, '机身厚度（mm）'))
         info['height'] = remove_remark(self.get_detail_info(root, '机身长度（mm）'))

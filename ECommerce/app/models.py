@@ -31,4 +31,4 @@ class Cellphone(Product):
     rom = StringField()
     frequency = StringField()
     screen_size = StringField()
-    network_support = StringField()
+    network_support = DictField()
