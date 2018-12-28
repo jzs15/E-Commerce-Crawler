@@ -133,7 +133,7 @@ class SDEngine:
                 m_dict['color'] = val.get_attribute('innerHTML')
             elif name == '4G网络制式':
                 network_support = val.get_attribute('innerHTML')
-                network_support = network_support if network_support else None
+                network_support = network_support if network_support else ''
                 m_dict['network_support'] = self.get_network_info(network_support)
 
 
