@@ -139,41 +139,41 @@ class SDEngine:
                 m_dict['network_support'] = self.get_network_info(val.get_attribute('innerHTML'))
 
 
-    def info_crawling(self, id_list, crawler, model):
+    def info_crawling(self, id):
+        print('id:', id)
         info = dict()
         driver = webdriver.Chrome()
-        for id in id_list:
-            self.init_dict(info)
-            url = "https://product.suning.com/" + id + ".html"
-            info['url'] = url
-            driver.get(url)
-            self.load_data(driver)
-            try:
-                self.get_common_info(driver, info)
-                crawler(driver, info)
-            except Exception as e:
-                traceback.print_tb(e)
-                continue
-            self.save_to_db(info, model)
+        self.init_dict(info)
+        url = "https://product.suning.com/" + id + ".html"
+        info['url'] = url
+        driver.get(url)
+        self.load_data(driver)
+        try:
+            self.get_common_info(driver, info)
+            self.crawler(driver, info)
+        except Exception as e:
+            traceback.print_tb(e)
+            return
+        self.save_to_db(info, self.model)
 
     def crawling(self, category):
         page_num = self.get_page_num(category)
-        crawler = None
-        model = None
+        self.crawler = None
+        self.model = None
         if category == '0-20002-':
-            crawler = self.cellphone_crawler
-            model = Cellphone
-        id_list = self.get_id_list(page_num, category)
-        self.info_crawling(id_list, crawler, model)
-        '''
+            self.crawler = self.cellphone_crawler
+            self.model = Cellphone
+        id_list = self.get_id_list(1, category)
+        #self.info_crawling(id_list, crawler, model)
+
         pool = Pool()
         ITERATION_COUNT = cpu_count() - 1
         count_per_iteration = len(id_list) / float(ITERATION_COUNT)
         for i in range(ITERATION_COUNT):
             list_start = int(count_per_iteration * i)
             list_end = int(count_per_iteration * (i+1))
-            pool.apply_async(self.info_crawling, id_list[])
-        '''
+            pool.apply_async(self.info_crawling, id_list[list_start:list_end])
+
 
 
     @staticmethod
