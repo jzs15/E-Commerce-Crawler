@@ -13,7 +13,6 @@ class AZEngine:
     def __init__(self):
         self.isConnected = False
         self.session = requests.Session()
-        requests.adapters.DEFAULT_RETRIES = 5
 
     def get_common_info(self, product_id, spider):
         url = "https://www.amazon.cn/dp/{}".format(product_id)

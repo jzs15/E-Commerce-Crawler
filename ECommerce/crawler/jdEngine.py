@@ -12,34 +12,34 @@ from crawler.util import *
 class JDEngine:
     def __init__(self):
         self.isConnected = False
-        requests.adapters.DEFAULT_RETRIES = 5
+        self.session = requests.Session()
 
     def get_common_info(self, product_id, spider):
         url = "https://item.jd.com/{}.html".format(product_id)
-        res = get_request(url)
+        res = get_request(url, self.session)
         if res is None:
             return
         root = lxml.html.etree.HTML(res.text)
         product_info = {'platform': '京东'}
 
-        title = root.xpath("//div[@class='sku-name']/text()")
-        product_info['title'] = self.get_title(title) if title else None
-
         shop_name = root.xpath("//div[@class='name']/a/@title|//div[@class='shopName']/strong/span/a/text()")
-        product_info['shop_name'] = str(shop_name[0]) if shop_name else None
+        product_info['shop_name'] = str(shop_name[0]) if shop_name else '京东自营'
 
         image_url = root.xpath('//img[@id="spec-img"]/@data-origin')
-        product_info['image'] = str(image_url[0]) if image_url else None
+        product_info['image'] = str(image_url[0]) if image_url else ''
         brand = self.get_detail_info(root, "品牌")
         if brand is None:
             brand = root.xpath("//ul[@id='parameter-brand']/li/@title")
-            brand = str(brand[0]) if brand else None
+            brand = str(brand[0]) if brand else ''
         product_info['brand'] = brand
         model = self.get_detail_info(root, "型号")
         if model is None:
             model = root.xpath('//ul[@class="parameter2 p-parameter-list"]/li[1]/@title|//'
                                'ul[@class="parameter2"]/li[1]/@title')
-            model = str(model[0]) if model else None
+            model = str(model[0]) if model else ''
+
+        title = root.xpath("//div[@class='sku-name']/text()")
+        product_info['title'] = self.get_title(title) if title else model
         product_info['model'] = model
         product_info['date'] = self.get_date(root)
         product_info['price'] = self.get_price(product_id)
@@ -51,7 +51,7 @@ class JDEngine:
     @staticmethod
     def get_detail_info(root, val):
         detail = root.xpath("//dt[text()='{}']/following-sibling::*/text()".format(val))
-        return str(detail[-1]) if detail else None
+        return str(detail[-1]) if detail else ''
 
     @staticmethod
     def get_title(title):
@@ -59,25 +59,23 @@ class JDEngine:
             if len(t.strip()) != 0:
                 return t.strip()
 
-    @staticmethod
-    def get_price(product_id):
+    def get_price(self, product_id):
         reg = r'"p":"(.*?)"'
         url = 'https://p.3.cn/prices/mgets?skuIds=J_{}'.format(product_id)
-        req = get_request(url)
+        req = get_request(url, self.session)
         page = req.text
         price_list = re.findall(re.compile(reg), page)
         return float(price_list[0])
 
-    @staticmethod
-    def get_evaluation(product_id):
+    def get_evaluation(self, product_id):
         evaluation = {}
         url = 'https://sclub.jd.com/comment/productPageComments.action?callback=fetchJSON_comment98vv4403&' \
               'productId={}&score=3&sortType=5&page=04&pageSize=1&isShadowSku=0&rid=0&fold=1'.format(product_id)
         page = ''
         while len(page) == 0:
-            req = get_request(url)
+            req = get_request(url, self.session)
             while req.status_code != 200:
-                req = get_request(url)
+                req = get_request(url, self.session)
             page = req.text
         good = re.findall(re.compile(r'"goodCount":(.[0-9]*)'), page)
         good = int(good[0]) if good else 0
@@ -90,10 +88,9 @@ class JDEngine:
         evaluation['score'] = (good * 5 + general * 3 + poor) / total if total else 0
         return evaluation
 
-    @staticmethod
-    def get_max_page(cat):
+    def get_max_page(self, cat):
         url = "https://list.jd.com/list.html?cat={}".format(cat)
-        res = get_request(url)
+        res = get_request(url, self.session)
         if res is None:
             return 0
         res.encoding = 'utf-8'
@@ -154,7 +151,7 @@ class JDEngine:
             model = Cellphone
         for i in range(n):
             url = "https://list.jd.com/list.html?cat={}&page=".format(cat) + str(i)
-            res = get_request(url)
+            res = get_request(url, self.session)
             if res is None:
                 continue
             res.encoding = 'utf-8'
@@ -177,14 +174,23 @@ class JDEngine:
             products.update(**info)
 
 
-def get_request(url):
+def get_request(url, session, times=0):
+    if times >= 10:
+        print("Request failed: " + url)
+        return None
     try:
-        res = requests.get(url)
+        header = {'User-Agent': 'Mozilla/5.0',
+                  'charset': 'utf-8'}
+        res = session.get(url, headers=header)
+        if res.status_code != 200:
+            time.sleep(3)
+            res = get_request(url, session, times + 1)
     except ConnectionError:
         try:
-            time.sleep(5)
-            res = requests.get(url)
+            time.sleep(3)
+            res = get_request(url, session, times + 1)
         except ConnectionError:
+            print("Request failed: " + url)
             res = None
     return res
 

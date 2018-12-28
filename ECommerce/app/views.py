@@ -51,16 +51,23 @@ def get_filter_list(model, value):
 
 def products_filter(request):
     page = request.GET.get('page')
-    category = request.GET.get('category')
+    platform = request.GET.get('platform')
     brand = request.GET.get('brand')
     filtered = []
     filter_list = []
     products = Cellphone.objects.all()
-    if brand is not None:
+    if brand:
         products = products.filter(brand=brand)
         filtered.append(('品牌', 'brand', brand))
-    else:
+
+    if platform:
+        products = products.filter(platform=platform)
+        filtered.append(('商城', 'platform', platform))
+
+    if not brand:
         filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
+    if not platform:
+        filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
 
     total_result = len(products)
     paginator = Paginator(products, 60)

@@ -9,6 +9,7 @@ from selenium.common.exceptions import NoSuchElementException
 import traceback
 from multiprocessing import Pool, cpu_count
 
+
 class SDEngine:
     def __init__(self):
         self.is_connect = False
@@ -28,7 +29,7 @@ class SDEngine:
         id_list = list()
         for page in range(page_num):
             driver.get("https://list.suning.com/" + category + str(page) + ".html")
-            for i in range(10):
+            for i in range(5):
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
                 time.sleep(1)
             ID_list = driver.find_element_by_id('product-list').find_elements_by_xpath(".//ul/li[@id]")
@@ -67,7 +68,7 @@ class SDEngine:
         try:
             m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath('.//a').get_attribute('innerHTML')
         except:
-            m_dict['shop_name'] = 'None'
+            m_dict['shop_name'] = '苏宁自营'
 
         driver.find_element_by_xpath('//li[@id="productCommTitle"]/a').click()
         driver.implicitly_wait(3)
@@ -91,7 +92,10 @@ class SDEngine:
                 continue
             val = item.find_element_by_xpath('.//td[@class="val"]')
             if name == '品牌':
-                m_dict['brand'] = val.find_element_by_xpath('.//a').get_attribute('innerHTML')
+                try:
+                    m_dict['brand'] = val.find_element_by_xpath('.//a').get_attribute('innerHTML')
+                except NoSuchElementException:
+                    m_dict['brand'] = val.get_attribute('innerHTML')
             elif name == '型号':
                 m_dict['model'] = val.get_attribute('innerHTML')
             elif name == '上市时间':
