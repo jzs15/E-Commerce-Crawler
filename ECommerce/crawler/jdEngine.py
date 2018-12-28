@@ -27,10 +27,10 @@ class JDEngine:
 
         image_url = root.xpath('//img[@id="spec-img"]/@data-origin')
         product_info['image'] = str(image_url[0]) if image_url else ''
-        brand = self.get_detail_info(root, "品牌")
+        brand = root.xpath("//ul[@id='parameter-brand']/li/@title")
+        brand = str(brand[0]) if brand else None
         if brand is None:
-            brand = root.xpath("//ul[@id='parameter-brand']/li/@title")
-            brand = str(brand[0]) if brand else ''
+            brand = self.get_detail_info(root, "品牌")
         product_info['brand'] = brand
         model = self.get_detail_info(root, "型号")
         if model is None:
