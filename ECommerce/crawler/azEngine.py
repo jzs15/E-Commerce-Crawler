@@ -9,7 +9,7 @@ import time
 from crawler.util import *
 
 
-class JDEngine:
+class AZEngine:
     def __init__(self):
         self.isConnected = False
         requests.adapters.DEFAULT_RETRIES = 5
@@ -20,29 +20,26 @@ class JDEngine:
         if res is None:
             return
         root = lxml.html.etree.HTML(res.text)
-        product_info = {'platform': '京东'}
+        product_info = {'platform': '亚马逊'}
 
-        title = root.xpath("//div[@class='sku-name']/text()")
+        title = root.xpath("//span[@id='productTitle']/text()")
         product_info['title'] = self.get_title(title) if title else None
 
-        shop_name = root.xpath("//div[@class='name']/a/@title|//div[@class='shopName']/strong/span/a/text()")
-        product_info['shop_name'] = str(shop_name[0]) if shop_name else None
+        shop_name = root.xpath("//span[@id='ddmMerchantMessage']/a/text()")
+        product_info['shop_name'] = str(shop_name) if shop_name else None
 
-        image_url = root.xpath('//img[@id="spec-img"]/@data-origin')
+        image_url = root.xpath('//img[@id="landingImage"]/@src')
         product_info['image'] = str(image_url[0]) if image_url else None
-        brand = self.get_detail_info(root, "品牌")
-        if brand is None:
-            brand = root.xpath("//ul[@id='parameter-brand']/li/@title")
-            brand = str(brand[0]) if brand else None
-        product_info['brand'] = brand
-        model = self.get_detail_info(root, "型号")
-        if model is None:
-            model = root.xpath('//ul[@class="parameter2 p-parameter-list"]/li[1]/@title|//'
-                               'ul[@class="parameter2"]/li[1]/@title')
-            model = str(model[0]) if model else None
-        product_info['model'] = model
-        product_info['date'] = self.get_date(root)
-        product_info['price'] = self.get_price(product_id)
+
+        brand = root.xpath("//a[@id='bylineInfo']/text()")
+        product_info['brand'] = str(brand[0]) if brand else None
+
+        product_info['model'] = self.get_detail_info(root, "型号")
+        product_info['date'] = self.get_detail_info(root, "Amazon.cn上架时间")
+        price = root.xpath("//span[@id='priceblock_ourprice']/text()")
+        if price:
+            price = float(price.replace('￥', '').replace(',', ''))
+        product_info['price'] = price
         product_info['url'] = url
         evaluation = self.get_evaluation(product_id)
         other_info = spider(root)
@@ -58,15 +55,6 @@ class JDEngine:
         for t in title:
             if len(t.strip()) != 0:
                 return t.strip()
-
-    @staticmethod
-    def get_price(product_id):
-        reg = r'"p":"(.*?)"'
-        url = 'https://p.3.cn/prices/mgets?skuIds=J_{}'.format(product_id)
-        req = get_request(url)
-        page = req.text
-        price_list = re.findall(re.compile(reg), page)
-        return float(price_list[0])
 
     @staticmethod
     def get_evaluation(product_id):
@@ -92,30 +80,26 @@ class JDEngine:
 
     @staticmethod
     def get_max_page(cat):
-        url = "https://list.jd.com/list.html?cat={}".format(cat)
+        url = "https://www.amazon.cn/s/ref=sv_cps_0?node={}".format(cat)
         res = get_request(url)
         if res is None:
             return 0
         res.encoding = 'utf-8'
         root = lxml.html.etree.HTML(res.text)
-        num = root.xpath('//span[@class="p-skip"]/em/b/text()')
+        num = root.xpath('//div[@id="pagn"]/span[@class="pagnDisabled"]/text()')
         return int(num[0])
 
     def get_date(self, root):
-        year = self.get_detail_info(root, '上市年份')
-        month = self.get_detail_info(root, '上市月份')
+        year = self.get_detail_info(root, '型号年份')
         date = ''
         if year:
             year = str(year.replace('年', ''))
-            if year.isnumeric() and month:
+            if year.isnumeric():
                 date = year
-                month = month.replace('月', '')
-                if month.isnumeric():
-                    date += '.{:02d}'.format(int(month))
         return date
 
     def get_network_info(self, root):
-        net = self.get_detail_info(root, '4G网络')
+        net = self.get_detail_info(root, '网络制式')
         if net:
             china_mobile = net.find("移动") >= 0
             china_unicom = net.find("联通") >= 0
@@ -138,7 +122,7 @@ class JDEngine:
         info['rom'] = self.get_detail_info(root, 'ROM')
         info['frequency'] = self.get_detail_info(root, '分辨率')
         info['screen_size'] = self.get_detail_info(root, '主屏幕尺寸（英寸）')
-        info['network_support'] = self.get_network_info(root)
+        info['network'] = self.get_network_info(root)
         info['weight'] = remove_remark(self.get_detail_info(root, '机身重量（g）'))
         info['thickness'] = remove_remark(self.get_detail_info(root, '机身厚度（mm）'))
         info['height'] = remove_remark(self.get_detail_info(root, '机身长度（mm）'))
@@ -149,17 +133,17 @@ class JDEngine:
         n = self.get_max_page(cat)
         spider = None
         model = None
-        if cat == '9987,653,655':
+        if cat == '665002051':
             spider = self.cellphone_spider
             model = Cellphone
         for i in range(n):
-            url = "https://list.jd.com/list.html?cat={}&page=".format(cat) + str(i)
+            url = "https://www.amazon.cn/s/ref=sv_cps_0?node={}&page={}".format(cat, i)
             res = get_request(url)
             if res is None:
                 continue
             res.encoding = 'utf-8'
             root = lxml.html.etree.HTML(res.text)
-            ids = root.xpath('//li[@class="gl-item"]//div[@class="gl-i-wrap j-sku-item"]/@data-sku')
+            ids = root.xpath('//div[@id="mainResults"]/ul/li/@data-asin')
             for j in range(len(ids)):
                 info = self.get_common_info(re.sub('\s', '', ids[j]), spider)
                 self.save_to_db(info, model)
@@ -177,13 +161,21 @@ class JDEngine:
             products.update(**info)
 
 
-def get_request(url):
+def get_request(url, times=0):
+    if times >= 10:
+        return None
     try:
-        res = requests.get(url)
+        session = requests.Session()
+        header = {'User-Agent': 'Mozilla/5.0 (Windows NT x.y; Win64; x64; rv:10.0) Gecko/20100101 Firefox/10.0 '}
+        session.trust_env = False
+        res = session.get(url, headers=header)
+        if res.status_code != 200:
+            time.sleep(3)
+            res = get_request(url, times + 1)
     except ConnectionError:
         try:
-            time.sleep(5)
-            res = requests.get(url)
+            time.sleep(3)
+            res = get_request(url, times + 1)
         except ConnectionError:
             res = None
     return res
@@ -191,8 +183,8 @@ def get_request(url):
 
 def main():
     start_time = time.time()
-    jd = JDEngine()
-    jd.crawler('9987,653,655')
+    az = AZEngine()
+    az.crawler('665002051')
     print("--- %s seconds ---" % (time.time() - start_time))
 
 

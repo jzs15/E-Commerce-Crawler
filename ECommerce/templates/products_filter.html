@@ -81,7 +81,7 @@
         {% for product in products.object_list %}
             <tr>
                 <td>
-                    <img src="{{ product.image_url }}" width="160px" alt="">
+                    <img src="{{ product.image }}" width="160px" alt="">
                 </td>
                 <td>
                     <p><a href="/compare/{{ product.id }}">{{ product.name }}</a></p>
@@ -92,11 +92,17 @@
                 </td>
                 <td width="15%">
                     <p style="float: right;">
-                        有{{ product.eval_total }}人评论</p>
+                        有{{ product.comment_num }}人评论</p>
                 </td>
                 <td width="20%" colspan="2">
-                    {% if product.platform == 'JD' %}
+                    {% if product.platform == '京东' %}
                         <p style="float: right;"><img src="{% static 'img/jd.ico' %}" alt="" width="15px">京东商城</p>
+                    {% elif product.platform == '苏宁' %}
+                        <p style="float: right;"><img src="{% static 'img/sn.ico' %}" alt="" width="15px">苏宁易购</p>
+                    {% elif product.platform == '淘宝' %}
+                        <p style="float: right;"><img src="{% static 'img/tb.ico' %}" alt="" width="15px">淘宝</p>
+                    {% elif product.platform == '亚马逊' %}
+                        <p style="float: right;"><img src="{% static 'img/az.ico' %}" alt="" width="15px">中国亚马逊</p>
                     {% endif %}
                     <p style="float: right;">{{ product.shop_name }}</p>
                 </td>
