@@ -165,10 +165,8 @@ def get_request(url, times=0):
     if times >= 10:
         return None
     try:
-        session = requests.Session()
         header = {'User-Agent': 'Mozilla/5.0 (Windows NT x.y; Win64; x64; rv:10.0) Gecko/20100101 Firefox/10.0 '}
-        session.trust_env = False
-        res = session.get(url, headers=header)
+        res = requests.get(url, headers=header)
         if res.status_code != 200:
             time.sleep(3)
             res = get_request(url, times + 1)
