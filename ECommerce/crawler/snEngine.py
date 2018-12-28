@@ -7,7 +7,7 @@ from app.models import *
 from mongoengine import *
 from selenium.common.exceptions import NoSuchElementException
 import traceback
-
+from multiprocessing import Pool, cpu_count
 
 class SDEngine:
     def __init__(self):
@@ -20,9 +20,7 @@ class SDEngine:
         res = requests.get("https://list.suning.com/" + category + "0" + ".html")
         etree = lxml.html.etree
         root = etree.HTML(res.text)
-        return int(root.xpath(
-            '//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[
-                       -1].attrib['pagenum'])
+        return int(root.xpath('//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[-1].attrib['pagenum'])
 
     @staticmethod
     def get_id_list(page_num, category):
@@ -46,13 +44,13 @@ class SDEngine:
         for i in self.cellphone_info_list:
             m_dict[i] = 'None'
         m_dict['platform'] = '苏宁'
+        m_dict['network_support'] = {'china_mobile': False, 'china_unicom': False, 'china_telecom': False, 'all_kind': False}
 
 
     def save_to_db(self, m_dict, model):
         if not self.is_connect:
             connect(DATABASE_NAME)
             self.is_connect = True
-
         products = model.objects.filter(url=m_dict['url'])
         if products.first() is None:
             product = model(**m_dict)
@@ -141,14 +139,7 @@ class SDEngine:
                 m_dict['network_support'] = self.get_network_info(val.get_attribute('innerHTML'))
 
 
-    def crawling(self, category):
-        page_num = self.get_page_num(category)
-        crawler = None
-        model = None
-        if category == '0-20002-':
-            crawler = self.cellphone_crawler
-            model = Cellphone
-        id_list = ['0000000000/945048517']#self.get_id_list(page_num, category)
+    def info_crawling(self, id_list, crawler, model):
         info = dict()
         driver = webdriver.Chrome()
         for id in id_list:
@@ -164,6 +155,26 @@ class SDEngine:
                 traceback.print_tb(e)
                 continue
             self.save_to_db(info, model)
+
+    def crawling(self, category):
+        page_num = self.get_page_num(category)
+        crawler = None
+        model = None
+        if category == '0-20002-':
+            crawler = self.cellphone_crawler
+            model = Cellphone
+        id_list = self.get_id_list(page_num, category)
+        self.info_crawling(id_list, crawler, model)
+        '''
+        pool = Pool()
+        ITERATION_COUNT = cpu_count() - 1
+        count_per_iteration = len(id_list) / float(ITERATION_COUNT)
+        for i in range(ITERATION_COUNT):
+            list_start = int(count_per_iteration * i)
+            list_end = int(count_per_iteration * (i+1))
+            pool.apply_async(self.info_crawling, id_list[])
+        '''
+
 
     @staticmethod
     def get_network_info(net):
@@ -184,7 +195,7 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     sd = SDEngine()
-    #sd.crawling('0-20002-')
+    sd.crawling('0-20002-')
     id_list = sd.get_id_list(50, '0-20002-')
     print(len(id_list))
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
