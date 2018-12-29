@@ -25,7 +25,7 @@ def search(request):
     items = Product.objects.filter(q_object)
 
     if sort1 is '1':
-        items = items.order_by('price')
+        items = items.order_by('price', '')
     elif sort1 is '2':
         items = items.order_by('-price')
     else:
@@ -50,44 +50,77 @@ def search(request):
 def get_filter_list(model, value):
     lst = list(model.values_list(value))
     counts = collections.Counter(lst)
-    return sorted(set(lst), key=counts.get, reverse=True)
+    lst = sorted(set(lst), key=counts.get, reverse=True)
+    if '' in lst:
+        lst.remove('')
+    if lst:
+        lst += [''] * (8 - len(lst) % 8)
+    return [lst[i:i+8] for i in range(0, len(lst), 8)]
 
 
-def get_products_by_category(category):
+def get_products_by_category(request, category):
     if category == '手机':
-        return Cellphone.objects.all()
+        return cellphone_filter(request)
     return None
 
 
-def category_list_page(request):
-    return render(request, 'products_filter.html')
-
-
-def products_filter(request, category):
-    if not category:
-        return category_list_page(request)
-    page = request.GET.get('page')
-    platform = request.GET.get('platform')
-    brand = request.GET.get('brand')
+def cellphone_filter(request):
+    products = Cellphone.objects.all()
     filtered = []
     filter_list = []
-    products = get_products_by_category(category)
-    if products is None:
-        return page_not_found(request)
-
+    color = request.GET.get('color')
+    platform = request.GET.get('platform')
+    brand = request.GET.get('brand')
+    cpu = request.GET.get('cpu')
+    ram = request.GET.get('ram')
+    rom = request.GET.get('rom')
     if brand:
         products = products.filter(brand=brand)
         filtered.append(('品牌', 'brand', brand))
-
+    if cpu:
+        products = products.filter(cpu=cpu)
+        filtered.append(('CPU', 'cpu', cpu))
+    if ram:
+        products = products.filter(ram=ram)
+        filtered.append(('RAM', 'ram', ram))
+    if rom:
+        products = products.filter(rom=rom)
+        filtered.append(('ROM', 'rom', rom))
+    if color:
+        products = products.filter(color=color)
+        filtered.append(('机身颜色', 'color', color))
     if platform:
         products = products.filter(platform=platform)
         filtered.append(('商城', 'platform', platform))
 
     if not brand:
         filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
+    if not cpu:
+        filter_list.append(('CPU', 'cpu', get_filter_list(products, 'cpu')))
+    if not ram:
+        filter_list.append(('RAM', 'ram', get_filter_list(products, 'ram')))
+    if not rom:
+        filter_list.append(('ROM', 'rom', get_filter_list(products, 'rom')))
+    if not color:
+        filter_list.append(('机身颜色', 'color', get_filter_list(products, 'color')))
     if not platform:
         filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
 
+    return products, filtered, filter_list
+
+
+def category_list_page(request):
+    return render(request, 'categories.html')
+
+
+def products_filter(request, category):
+    if not category:
+        return category_list_page(request)
+    products, filtered, filter_list = get_products_by_category(request, category)
+    if products is None:
+        return page_not_found(request)
+
+    page = request.GET.get('page')
     total_result = len(products)
     paginator = Paginator(products, 60)
     try:

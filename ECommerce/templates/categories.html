@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>案件一覧</title>
+
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+        }
+
+        th {
+            border: 1px solid black;
+        }
+
+        td {
+            border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+<table id="t_table">
+    <tr id="tr1">
+        <th colspan="1">
+            <a id="searchChange" onclick="return searchChange()" href="">－</a>
+        </th>
+        <th colspan="4">
+            title
+        </th>
+    </tr>
+    <tr id="tr2">
+        <td rowspan="3"> </td>
+        <td>5</td>
+        <td>6</td>
+        <td>7</td>
+        <td>8</td>
+    </tr>
+    <tr id="tr3">
+        <td>apple</td>
+        <td>bags</td>
+        <td>balana</td>
+        <td>orange</td>
+    </tr>
+    <tr id="tr4">
+        <td>1</td>
+        <td>2</td>
+        <td>3</td>
+        <td>4</td>
+    </tr>
+</table>
+<input type="hidden" name="searchChangeFlg" id="searchChangeFlg" value="0"/>
+</body>
+</html>

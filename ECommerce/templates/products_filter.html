@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -8,6 +8,27 @@
     {% bootstrap_css %}
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script type="text/javascript" src="{% static 'js/products_filter.js' %}">
+    </script>
+    <script type="text/javascript">
+        function searchChange(num, col) {
+            open_elem = document.getElementById("open_" + num);
+            if (open_elem.innerText === "更多↓") {
+                let hide_tables = document.getElementsByClassName("hide_table_" + num);
+                for (let i = 0; i < hide_tables.length; i++) {
+                    hide_tables[i].removeAttribute("style");
+                }
+                document.getElementById("filter_name_" + num).setAttribute("rowspan", col);
+                open_elem.innerText = "收缩↑";
+            } else {
+                let hide_tables = document.getElementsByClassName("hide_table_" + num);
+                for (let i = 0; i < hide_tables.length; i++) {
+                    hide_tables[i].style.display = "none";
+                }
+                document.getElementById("filter_name_" + num).setAttribute("rowspan", 1);
+                open_elem.innerText = "更多↓";
+            }
+            return false;
+        }
     </script>
 </head>
 <body class="gray_body">
@@ -18,7 +39,7 @@
                 <th width="10%">
                     您已选择：
                 </th>
-                <td>
+                <td colspan="10">
                     {% for name_cn, name_en, value in filtered %}
                         <div class="filtered">{{ name_cn }}:<a href="#"
                                                                onclick="RemoveFilter('{{ name_en }}')">{{ value }}x</a>
@@ -31,17 +52,38 @@
                 </th>
             {% endif %}
         </tr>
-        {% for name_cn, name_en, values in filter_list %}
-            <tr>
-                <th width="10%">
-                    {{ name_cn }}：
-                </th>
-                <td>
-                    {% for value in values %}
-                        <a href="#" onclick="AddFilter('{{ name_en }}', '{{ value }}')">{{ value }}</a>
-                    {% endfor %}
-                </td>
-            </tr>
+        {% for name_cn, name_en, values_list in filter_list %}
+            {% for values in values_list %}
+                <tr>
+                    {% if forloop.first %}
+                        <th width="10%" id="filter_name_{{ forloop.parentloop.counter0 }}" rowspan="1" style="vertical-align: top;">
+                            {{ name_cn }}：
+                        </th>
+                        {% for value in values %}
+                            <td width="10%">
+                                <a href="#" onclick="AddFilter('{{ name_en }}', '{{ value }}')">{{ value }}</a>
+                            </td>
+                        {% endfor %}
+                        {% if  values_list|length > 1 %}
+                            <td width="10%">
+                                <a href="#"
+                                   onclick="searchChange('{{ forloop.parentloop.counter0 }}', '{{ values_list|length }}')"
+                                   id="open_{{ forloop.parentloop.counter0 }}">更多↓</a>
+                            </td>
+                        {% else %}
+                            <td width="10%">
+                            </td>
+                        {% endif %}
+                    {% else %}
+                        {% for value in values %}
+                            <td width="10%" class="hide_table_{{ forloop.parentloop.parentloop.counter0 }}" style="display: none">
+                                <a href="#" onclick="AddFilter('{{ name_en }}', '{{ value }}')">{{ value }}</a>
+                            </td>
+                        {% endfor %}
+                    {% endif %}
+
+                </tr>
+            {% endfor %}
         {% endfor %}
     </table>
 </div>
