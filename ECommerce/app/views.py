@@ -51,8 +51,42 @@ def get_filter_list(model, value):
     lst = list(model.values_list(value))
     counts = collections.Counter(lst)
     lst = sorted(set(lst), key=counts.get, reverse=True)
+
     if '' in lst:
         lst.remove('')
+    if '其他' in lst:
+        lst.remove('其他')
+        lst.append('其他')
+    if lst:
+        lst += [''] * (8 - len(lst) % 8)
+    return [lst[i:i+8] for i in range(0, len(lst), 8)]
+
+
+def get_filter_list_sorted(model, value):
+    lst = list(set(list(model.values_list(value))))
+    if '' in lst:
+        lst.remove('')
+
+    mb = []
+    gb = []
+    tb = []
+    etc = []
+    for x in lst:
+        if 'MB' in x and x[:-2].isnumeric():
+            mb.append(int(x[:-2]))
+        elif 'GB' in x and x[:-2].isnumeric():
+            gb.append(int(x[:-2]))
+        elif 'TB' in x and x[:-2].isnumeric():
+            gb.append(int(x[:-2]))
+        else:
+            etc.append(x)
+    mb.sort(reverse=True)
+    gb.sort(reverse=True)
+    lst = [str(x) + 'TB' for x in tb] + [str(x) + 'GB' for x in gb] + [str(x) + 'MB' for x in mb] + etc
+
+    if '其他' in lst:
+        lst.remove('其他')
+        lst.append('其他')
     if lst:
         lst += [''] * (8 - len(lst) % 8)
     return [lst[i:i+8] for i in range(0, len(lst), 8)]
@@ -98,9 +132,9 @@ def cellphone_filter(request):
     if not cpu:
         filter_list.append(('CPU', 'cpu', get_filter_list(products, 'cpu')))
     if not ram:
-        filter_list.append(('RAM', 'ram', get_filter_list(products, 'ram')))
+        filter_list.append(('RAM', 'ram', get_filter_list_sorted(products, 'ram')))
     if not rom:
-        filter_list.append(('ROM', 'rom', get_filter_list(products, 'rom')))
+        filter_list.append(('ROM', 'rom', get_filter_list_sorted(products, 'rom')))
     if not color:
         filter_list.append(('机身颜色', 'color', get_filter_list(products, 'color')))
     if not platform:
