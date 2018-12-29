@@ -59,7 +59,7 @@ def get_filter_list(model, value):
         lst.append('其他')
     if lst:
         lst += [''] * (8 - len(lst) % 8)
-    return [lst[i:i+8] for i in range(0, len(lst), 8)]
+    return [lst[i:i + 8] for i in range(0, len(lst), 8)]
 
 
 def get_filter_list_sorted(model, value):
@@ -89,7 +89,7 @@ def get_filter_list_sorted(model, value):
         lst.append('其他')
     if lst:
         lst += [''] * (8 - len(lst) % 8)
-    return [lst[i:i+8] for i in range(0, len(lst), 8)]
+    return [lst[i:i + 8] for i in range(0, len(lst), 8)]
 
 
 def get_products_by_category(request, category):
@@ -152,35 +152,18 @@ def cellphone_filter(request):
 def category_list_page(request):
     return render(request, 'categories.html')
 
+
 def products_filter(request, category):
     if not category:
         return category_list_page(request)
     page = request.GET.get('page')
-    platform = request.GET.get('platform')
-    brand = request.GET.get('brand')
     common = request.GET.get('common')
     sort_list = {'price': ('价格', request.GET.get('price')), 'score': ('评分', request.GET.get('score')),
                  'date': ('上市时间', request.GET.get('date')), 'comment_num': ('全网评论数', request.GET.get('comment_num'))}
-    filtered = list()
-    filter_list = list()
-    sorted_list = list()
-    products = get_products_by_category(category)
+    sorted_list = []
+    products, filtered, filter_list = get_products_by_category(request, category)
     if products is None:
         return page_not_found(request)
-
-    if brand:
-        products = products.filter(brand=brand)
-        filtered.append(('品牌', 'brand', brand))
-
-    if platform:
-        products = products.filter(platform=platform)
-        filtered.append(('商城', 'platform', platform))
-
-    if not brand:
-        filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
-    if not platform:
-        filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
-
 
     if common is None:
         for name, value in sort_list.items():
@@ -190,8 +173,8 @@ def products_filter(request, category):
                 sorted_list.append(name)
             else:
                 sorted_list.append('-' + name)
+        print(sorted_list)
         products = products.order_by(*sorted_list)
-
 
     total_result = len(products)
     paginator = Paginator(products, 60)
@@ -205,7 +188,8 @@ def products_filter(request, category):
     return render(request, 'products_filter.html', {'products': products,
                                                     'max_page': paginator.num_pages, 'total_result': total_result,
                                                     'filter_list': filter_list,
-                                                    'filtered': filtered if filtered else None})
+                                                    'filtered': filtered if filtered else None,
+                                                    'sort_list': sort_list, 'common': common})
 
 
 def compare(request, product_id):

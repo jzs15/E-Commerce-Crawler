@@ -166,6 +166,8 @@ class JDEngine:
         if not self.isConnected:
             connect(DATABASE_NAME)
             self.isConnected = True
+        if not info['title']:
+            return
 
         products = model.objects.filter(url=info['url'])
         if products.first() is None:

@@ -56,7 +56,8 @@
             {% for values in values_list %}
                 <tr>
                     {% if forloop.first %}
-                        <th width="10%" id="filter_name_{{ forloop.parentloop.counter0 }}" rowspan="1" style="vertical-align: top;">
+                        <th width="10%" id="filter_name_{{ forloop.parentloop.counter0 }}" rowspan="1"
+                            style="vertical-align: top;">
                             {{ name_cn }}：
                         </th>
                         {% for value in values %}
@@ -76,7 +77,8 @@
                         {% endif %}
                     {% else %}
                         {% for value in values %}
-                            <td width="10%" class="hide_table_{{ forloop.parentloop.parentloop.counter0 }}" style="display: none">
+                            <td width="10%" class="hide_table_{{ forloop.parentloop.parentloop.counter0 }}"
+                                style="display: none">
                                 <a href="#" onclick="AddFilter('{{ name_en }}', '{{ value }}')">{{ value }}</a>
                             </td>
                         {% endfor %}
@@ -151,8 +153,12 @@
                     <p><a href="{{ product.url }}">{{ product.model }}</a></p>
                     <p>{{ product.title }}</p>
                 </td>
-                <td class="price">
-                    <p style="float: right;">¥{{ product.price }}</p>
+                <td class="price" width="10%">
+                    {% if product.price >= 0 %}
+                        <p style="float: right;">¥{{ product.price }}</p>
+                    {% else %}
+                        <p style="float: right;">暂无报价</p>
+                    {% endif %}
                 </td>
                 <td width="15%">
                     <p style="float: right;">
