@@ -29,7 +29,7 @@
 }
 
 .search_table table{
-    width: 90%;
+    width: 80%;
     margin: 0;
 }
 
@@ -54,6 +54,11 @@
 .price {
     color: red;
     font-weight: bold;
+}
+
+.page_not_found {
+    padding:0;
+    margin:0
 }
 
 .filtered{

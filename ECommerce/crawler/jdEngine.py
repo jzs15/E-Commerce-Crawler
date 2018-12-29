@@ -32,11 +32,12 @@ class JDEngine:
         if not brand:
             brand = self.get_detail_info(root, "品牌")
         product_info['brand'] = brand
-        model = self.get_detail_info(root, "型号")
+
+        model = root.xpath('//ul[@class="parameter2 p-parameter-list"]/li[1]/@title|//'
+                           'ul[@class="parameter2"]/li[1]/@title')
+        model = str(model[0]) if model else ''
         if not model:
-            model = root.xpath('//ul[@class="parameter2 p-parameter-list"]/li[1]/@title|//'
-                               'ul[@class="parameter2"]/li[1]/@title')
-            model = str(model[0]) if model else ''
+            model = self.get_detail_info(root, "型号")
 
         title = root.xpath("//div[@class='sku-name']/text()")
         product_info['title'] = self.get_title(title) if title else model
@@ -157,8 +158,8 @@ class JDEngine:
             res.encoding = 'utf-8'
             root = lxml.html.etree.HTML(res.text)
             ids = root.xpath('//li[@class="gl-item"]//div[@class="gl-i-wrap j-sku-item"]/@data-sku')
-            for j in range(len(ids)):
-                info = self.get_common_info(re.sub('\s', '', '7321794'), spider)
+            for product_id in ids:
+                info = self.get_common_info(re.sub('\s', '', product_id), spider)
                 self.save_to_db(info, model)
 
     def save_to_db(self, info, model):

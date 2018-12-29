@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, render_to_response
 from mongoengine.queryset.visitor import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from app.models import *
@@ -8,6 +8,10 @@ import collections
 
 def index(request):
     return render(request, 'index.html')
+
+
+def page_not_found(request):
+    return render_to_response('404.html')
 
 
 def search(request):
@@ -49,13 +53,22 @@ def get_filter_list(model, value):
     return sorted(set(lst), key=counts.get, reverse=True)
 
 
-def products_filter(request):
+def get_products_by_category(category):
+    if category == '手机':
+        return Cellphone.objects.all()
+    return None
+
+
+def products_filter(request, category):
     page = request.GET.get('page')
     platform = request.GET.get('platform')
     brand = request.GET.get('brand')
     filtered = []
     filter_list = []
-    products = Cellphone.objects.all()
+    products = get_products_by_category(category)
+    if products is None:
+        return page_not_found(request)
+
     if brand:
         products = products.filter(brand=brand)
         filtered.append(('品牌', 'brand', brand))

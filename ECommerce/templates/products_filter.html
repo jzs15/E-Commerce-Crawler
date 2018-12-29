@@ -11,9 +11,6 @@
     </script>
 </head>
 <body class="gray_body">
-<div class="filter_table">
-    <p>共找到相关商品{{ total_result }}件</p>
-</div>
 <div class="filter_table filter_head">
     <table class="table">
         <tr>
@@ -96,16 +93,19 @@
                 </td>
                 <td width="20%" colspan="2">
                     {% if product.platform == '京东' %}
-                        <p style="float: right;"><img src="{% static 'img/jd.ico' %}" alt="" width="15px">京东商城</p>
+                        <p align="right"><img src="{% static 'img/jd.ico' %}" alt="" width="15px">京东商城</p>
                     {% elif product.platform == '苏宁' %}
-                        <p style="float: right;"><img src="{% static 'img/sn.ico' %}" alt="" width="15px">苏宁易购</p>
+                        <p align="right"><img src="{% static 'img/sn.ico' %}" alt="" width="15px">苏宁易购</p>
                     {% elif product.platform == '淘宝' %}
-                        <p style="float: right;"><img src="{% static 'img/tb.ico' %}" alt="" width="15px">淘宝</p>
+                        <p align="right"><img src="{% static 'img/tb.ico' %}" alt="" width="15px">淘宝</p>
                     {% elif product.platform == '亚马逊' %}
-                        <p style="float: right;"><img src="{% static 'img/az.ico' %}" alt="" width="15px">中国亚马逊</p>
+                        <p align="right"><img src="{% static 'img/az.ico' %}" alt="" width="15px">中国亚马逊</p>
                     {% endif %}
-                    <p style="float: right;">{{ product.shop_name }}</p>
+                    <p align="right">{{ product.shop_name }}</p>
                 </td>
+            </tr>
+            <tr>
+
             </tr>
         {% endfor %}
     </table>
