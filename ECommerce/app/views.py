@@ -187,7 +187,7 @@ def products_filter(request, category):
 
     return render(request, 'products_filter.html', {'products': products,
                                                     'max_page': paginator.num_pages, 'total_result': total_result,
-                                                    'filter_list': filter_list,
+                                                    'category': category, 'filter_list': filter_list,
                                                     'filtered': filtered if filtered else None,
                                                     'sort_list': sort_list, 'common': common})
 

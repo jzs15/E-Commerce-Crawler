@@ -37,14 +37,14 @@
     background-color: #eee;
 }
 
-.filter_table{
+.filter_mid{
     display: flex;
     align-items: center;
     justify-content: center;
     margin-top: 10px;
 }
 
-.filter_table table {
+.filter_mid table {
     width: 80%;
     margin: 0;
     background-color: #fff;
@@ -73,7 +73,14 @@
     color: #E85708;
 }
 
-.filter_head th{
+.filter_head {
+    width: 80%;
+    margin: 0;
+    background-color: #fff;
+    display: table;
+}
+
+.filter_select th{
     vertical-align: middle;
 }
 
@@ -84,4 +91,14 @@
 
 .total b{
     color: red;
+}
+
+.logo_head {
+    float: left;
+}
+
+.search_head {
+    width: 60%;
+    display: table-cell;
+    vertical-align: middle;
 }

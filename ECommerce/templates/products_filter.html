@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
@@ -32,7 +32,20 @@
     </script>
 </head>
 <body class="gray_body">
-<div class="filter_table filter_head">
+<div class="filter_mid">
+    <div class="filter_head">
+        <img src="{% static 'img/image_not_found.jpg' %}" alt="" width="160px" height="75px">
+        <form method="get" action="{% url 'products_filter' category %}" class="search_head">
+            <div class="input-group">
+                <input type="text" class="form-control" name="str" placeholder="Search...">
+                <div class="input-group-append">
+                    <button class="input-group-text" id="basic-addon2">搜索</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="filter_mid filter_select">
     <table class="table">
         <tr>
             {% if filtered %}
@@ -89,7 +102,7 @@
         {% endfor %}
     </table>
 </div>
-<div class="filter_table">
+<div class="filter_mid">
     <table class="table">
         <tr>
             <td colspan="4">
