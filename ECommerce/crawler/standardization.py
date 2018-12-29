@@ -26,20 +26,39 @@ cellphone_brand_list = {
     '一加': ['一加', 'ONEPLUS'],
 }
 
-def change_brand_name(brand):
-    brand_upper = brand.upper()
-    for key, value in cellphone_brand_list.items():
+cpu_brand_list = {
+    '海思': ['海思', 'HISILICON'],
+    '骁龙': ['骁龙', 'SANPDRAGON'],
+    '联发科': ['联发科', 'MTK']
+}
+
+etc_list = ['以官网信息为准', '--']
+
+
+def change_etc(data):
+    if data in etc_list:
+        return '其他'
+    return data
+
+
+def change_name(data, std_list):
+    data = change_etc(data)
+    if data == '其他':
+        return data
+    brand_upper = data.upper()
+    for key, value in std_list.items():
         for v in value:
             if v in brand_upper:
                 return key
-    return brand
+    return data
 
 
 def standardization():
     connect(DATABASE_NAME)
     products = Cellphone.objects.all()
     for product in products:
-        product.brand = change_brand_name(product.brand)
+        product.brand = change_name(product.brand, cellphone_brand_list)
+        product.cpu = change_name(product.cpu, cpu_brand_list)
         product.save()
 
 
