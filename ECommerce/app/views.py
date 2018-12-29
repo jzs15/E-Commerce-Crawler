@@ -59,7 +59,13 @@ def get_products_by_category(category):
     return None
 
 
+def category_list_page(request):
+    return render(request, 'products_filter.html')
+
+
 def products_filter(request, category):
+    if not category:
+        return category_list_page(request)
     page = request.GET.get('page')
     platform = request.GET.get('platform')
     brand = request.GET.get('brand')
