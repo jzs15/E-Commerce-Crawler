@@ -1,11 +1,12 @@
+sort_list = ['price', 'score', 'date', 'comment_num']
+
 function RemoveFilter(name) {
     let req = GetRequest();
-    if (req.hasOwnProperty("page"))
-    {
+    if (req.hasOwnProperty("page")) {
         delete req["page"];
     }
     for (let key in req) {
-        if(key === name && req.hasOwnProperty(key)) {
+        if (key === name && req.hasOwnProperty(key)) {
             delete req[key];
             break;
         }
@@ -15,9 +16,29 @@ function RemoveFilter(name) {
 
 function AddFilter(name, value) {
     let req = GetRequest();
-    if (req.hasOwnProperty("page"))
-    {
+    if (req.hasOwnProperty("page")) {
         delete req["page"];
+    }
+    if (name === "common") {
+        if (req.hasOwnProperty("price")) {
+            delete req["price"];
+        }
+        if (req.hasOwnProperty("score")) {
+            delete req["score"];
+        }
+        if (req.hasOwnProperty("date")) {
+            delete req["date"];
+        }
+        if (req.hasOwnProperty("comment_num")) {
+            delete req["comment_num"];
+        }
+    }
+    for (var i in sort_list) {
+        if (sort_list[i] === name) {
+            if (req.hasOwnProperty("common")) {
+                delete req["common"];
+            }
+        }
     }
     req[name] = value;
 

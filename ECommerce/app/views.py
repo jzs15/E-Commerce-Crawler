@@ -69,8 +69,12 @@ def products_filter(request, category):
     page = request.GET.get('page')
     platform = request.GET.get('platform')
     brand = request.GET.get('brand')
-    filtered = []
-    filter_list = []
+    common = request.GET.get('common')
+    sort_list = {'price': ('价格', request.GET.get('price')), 'score': ('评分', request.GET.get('score')),
+                 'date': ('上市时间', request.GET.get('date')), 'comment_num': ('全网评论数', request.GET.get('comment_num'))}
+    filtered = list()
+    filter_list = list()
+    sorted_list = list()
     products = get_products_by_category(category)
     if products is None:
         return page_not_found(request)
@@ -88,6 +92,18 @@ def products_filter(request, category):
     if not platform:
         filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
 
+
+    if common is None:
+        for name, value in sort_list.items():
+            if value[1] is None:
+                continue
+            elif value[1] == 'up':
+                sorted_list.append(name)
+            else:
+                sorted_list.append('-' + name)
+        products = products.order_by(*sorted_list)
+
+
     total_result = len(products)
     paginator = Paginator(products, 60)
     try:
@@ -99,8 +115,8 @@ def products_filter(request, category):
 
     return render(request, 'products_filter.html', {'products': products,
                                                     'max_page': paginator.num_pages, 'total_result': total_result,
-                                                    'filter_list': filter_list,
-                                                    'filtered': filtered if filtered else None})
+                                                    'filter_list': filter_list, 'filtered': filtered if filtered else None,
+                                                    'sort_list': sort_list, 'common': common})
 
 
 def compare(request, product_id):
