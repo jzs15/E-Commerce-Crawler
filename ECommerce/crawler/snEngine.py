@@ -16,12 +16,14 @@ class SDEngine:
         self.common_info_list = ['image', 'title', 'price', 'comment_num', 'score', 'shop_name', 'url']
         self.cellphone_info_list = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
 
+
     @staticmethod
     def get_page_num(category):
         res = requests.get("https://list.suning.com/" + category + "0" + ".html")
         etree = lxml.html.etree
         root = etree.HTML(res.text)
         return int(root.xpath('//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[-1].attrib['pagenum'])
+
 
     @staticmethod
     def get_id_list(page_num, category):
@@ -192,7 +194,7 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     sd = SDEngine()
-    sd.crawling('0-20002-')
+    sd.crawling('0-20002-')    #cellphone
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
 
 

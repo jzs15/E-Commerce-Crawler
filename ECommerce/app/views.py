@@ -122,3 +122,9 @@ def products_filter(request, category):
 def compare(request, product_id):
     product = Product.objects.filter(id=product_id).first()
     return render(request, 'compare.html', {'product': product, 'items': product.items})
+
+
+def compare_same_model(request, model, product_id):
+    product = model.objects.filter(id=product_id).first()
+    products = model.objects.filter(model=product.model)
+
