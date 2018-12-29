@@ -92,10 +92,35 @@
         <tr>
             <td colspan="4">
                 <div class="btn-group" role="group" aria-label="Basic example" data-toggle="buttons">
-                    <button type="button" class="btn btn-outline-info btn-sm">默认排序</button>
-                    <button type="button" class="btn btn-outline-info btn-sm">价格↓</button>
-                    <button type="button" class="btn btn-outline-info btn-sm">销量↓</button>
-                    <button type="button" class="btn btn-outline-info btn-sm">时间↓</button>
+                    {% if common is None %}
+                        <button onclick="AddFilter('common','true')" type="button" class="btn btn-outline-info btn-sm">
+                            默认排序
+                        </button>
+                        {% for key, value in sort_list.items %}
+                            {% if value.1 == 'up' %}
+                                <button onclick="AddFilter('{{ key }}','down')" type="button"
+                                        class="btn btn-outline-info btn-sm"
+                                        style="background-color: #17a2b8;color: #FFFFFF">{{ value.0 }}↑
+                                </button>
+                            {% elif value.1 == 'down' %}
+                                <button onclick="AddFilter('{{ key }}','up')" type="button"
+                                        class="btn btn-outline-info btn-sm"
+                                        style="background-color: #17a2b8;color: #FFFFFF">{{ value.0 }}↓
+                                </button>
+                            {% else %}
+                                <button onclick="AddFilter('{{ key }}','up')" type="button"
+                                        class="btn btn-outline-info btn-sm">{{ value.0 }}</button>
+                            {% endif %}
+                        {% endfor %}
+                    {% else %}
+                        <button onclick="AddFilter('common','true')" type="button" class="btn btn-outline-info btn-sm"
+                                style="background-color: #17a2b8;color: #FFFFFF">默认排序
+                        </button>
+                        {% for key, value in sort_list.items %}
+                            <button onclick="AddFilter('{{ key }}','up')" type="button"
+                                    class="btn btn-outline-info btn-sm">{{ value.0 }}</button>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             </td>
             <td>

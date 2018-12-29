@@ -25,7 +25,7 @@ def search(request):
     items = Product.objects.filter(q_object)
 
     if sort1 is '1':
-        items = items.order_by('price', '')
+        items = items.order_by('price')
     elif sort1 is '2':
         items = items.order_by('-price')
     else:
@@ -152,15 +152,47 @@ def cellphone_filter(request):
 def category_list_page(request):
     return render(request, 'categories.html')
 
-
 def products_filter(request, category):
     if not category:
         return category_list_page(request)
-    products, filtered, filter_list = get_products_by_category(request, category)
+    page = request.GET.get('page')
+    platform = request.GET.get('platform')
+    brand = request.GET.get('brand')
+    common = request.GET.get('common')
+    sort_list = {'price': ('价格', request.GET.get('price')), 'score': ('评分', request.GET.get('score')),
+                 'date': ('上市时间', request.GET.get('date')), 'comment_num': ('全网评论数', request.GET.get('comment_num'))}
+    filtered = list()
+    filter_list = list()
+    sorted_list = list()
+    products = get_products_by_category(category)
     if products is None:
         return page_not_found(request)
 
-    page = request.GET.get('page')
+    if brand:
+        products = products.filter(brand=brand)
+        filtered.append(('品牌', 'brand', brand))
+
+    if platform:
+        products = products.filter(platform=platform)
+        filtered.append(('商城', 'platform', platform))
+
+    if not brand:
+        filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
+    if not platform:
+        filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
+
+
+    if common is None:
+        for name, value in sort_list.items():
+            if value[1] is None:
+                continue
+            elif value[1] == 'up':
+                sorted_list.append(name)
+            else:
+                sorted_list.append('-' + name)
+        products = products.order_by(*sorted_list)
+
+
     total_result = len(products)
     paginator = Paginator(products, 60)
     try:
