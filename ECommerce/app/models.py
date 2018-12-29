@@ -32,3 +32,19 @@ class Cellphone(Product):
     frequency = StringField()
     screen_size = StringField()
     network_support = DictField()
+
+
+class Refrigerator(Product):
+    color = StringField()
+    open_method = StringField()
+    weather = StringField()
+    VoltFre = StringField()
+    rank = StringField()
+    ability = StringField()
+    method = StringField()
+    dB = StringField()
+    weight = StringField()
+    cold_volume = StringField()
+    ice_volume = StringField()
+    form_size = StringField()
+    case_size = StringField()
