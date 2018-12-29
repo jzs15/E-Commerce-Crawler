@@ -105,12 +105,16 @@ def cellphone_filter(request):
     color = request.GET.get('color')
     platform = request.GET.get('platform')
     brand = request.GET.get('brand')
+    os = request.GET.get('os')
     cpu = request.GET.get('cpu')
     ram = request.GET.get('ram')
     rom = request.GET.get('rom')
     if brand:
         products = products.filter(brand=brand)
         filtered.append(('品牌', 'brand', brand))
+    if os:
+        products = products.filter(os=os)
+        filtered.append(('操作系统', 'os', os))
     if cpu:
         products = products.filter(cpu=cpu)
         filtered.append(('CPU', 'cpu', cpu))
@@ -129,6 +133,8 @@ def cellphone_filter(request):
 
     if not brand:
         filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
+    if not os:
+        filter_list.append(('操作系统', 'os', get_filter_list(products, 'os')))
     if not cpu:
         filter_list.append(('CPU', 'cpu', get_filter_list(products, 'cpu')))
     if not ram:

@@ -32,6 +32,11 @@ cpu_brand_list = {
     '联发科': ['联发科', 'MTK']
 }
 
+os_list = {
+    'Android': ['安卓', 'ANDROID'],
+    'IOS': ['IOS'],
+}
+
 etc_list = ['以官网信息为准', '--']
 
 
@@ -58,6 +63,7 @@ def standardization():
     products = Cellphone.objects.all()
     for product in products:
         product.brand = change_name(product.brand, cellphone_brand_list)
+        product.os = change_name(product.os, os_list)
         product.cpu = change_name(product.cpu, cpu_brand_list)
         product.save()
 
