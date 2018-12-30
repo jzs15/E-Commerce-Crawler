@@ -55,6 +55,8 @@ def get_filter_list(model, value):
 
     if '' in lst:
         lst.remove('')
+    if len(lst) == 1:
+        return []
     if '其他' in lst:
         lst.remove('其他')
         lst.append('其他')
@@ -67,6 +69,8 @@ def get_filter_list_sorted(model, value):
     lst = list(set(list(model.values_list(value))))
     if '' in lst:
         lst.remove('')
+    if len(lst) == 1:
+        return []
 
     mb = []
     gb = []
