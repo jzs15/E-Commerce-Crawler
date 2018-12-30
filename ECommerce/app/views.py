@@ -2,8 +2,8 @@ from django.shortcuts import render, render_to_response
 from mongoengine.queryset.visitor import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from app.models import *
-import segmentation
 import collections
+import thulac
 
 
 def index(request):
@@ -18,7 +18,8 @@ def search(request):
     page = request.GET.get('page')
     sort1 = request.GET.get('sort1')
     search_string = request.GET.get('str')
-    words = segmentation.cut(search_string)
+    thu = thulac.thulac()
+    words = thu.cut(search_string, text=True)
     q_object = Q()
     for word in words:
         q_object |= (Q(title__icontains=word) | Q(product_name__icontains=word))
@@ -98,10 +99,23 @@ def get_products_by_category(request, category):
     return None
 
 
+def get_products_by_search(products, search_string):
+    if not search_string:
+        return products
+    thu = thulac.thulac(seg_only=True)
+    words = thu.cut(search_string, text=True)
+    words = words.split()
+    q_object = Q()
+    for word in words:
+        q_object |= (Q(title__icontains=word) | Q(model__icontains=word))
+    return products.filter(q_object)
+
+
 def cellphone_filter(request):
     products = Cellphone.objects.all()
     filtered = []
     filter_list = []
+    products = get_products_by_search(products, request.GET.get('str'))
     color = request.GET.get('color')
     platform = request.GET.get('platform')
     brand = request.GET.get('brand')
@@ -173,7 +187,6 @@ def products_filter(request, category):
                 sorted_list.append(name)
             else:
                 sorted_list.append('-' + name)
-        print(sorted_list)
         products = products.order_by(*sorted_list)
 
     total_result = len(products)
