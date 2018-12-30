@@ -115,6 +115,34 @@ def get_products_by_search(products, search_string):
     return products.filter(q_object)
 
 
+def network_filter(products, net):
+    if net == '全网通':
+        products = products.filter(network_support__all_kind=True)
+    elif net == '移动':
+        products = products.filter(network_support__china_mobile=True)
+    elif net == '联通':
+        products = products.filter(network_support__china_unicom=True)
+    elif net == '电信':
+        products = products.filter(network_support__all_kind=True)
+    return products
+
+
+def get_network_filter_list(products):
+    filter_list = []
+    if products.filter(network_support__all_kind=True):
+        filter_list.append('全网通')
+    if products.filter(network_support__china_mobile=True):
+        filter_list.append('移动')
+    if products.filter(network_support__china_unicom=True):
+        filter_list.append('联通')
+    if products.filter(network_support__all_kind=True):
+        filter_list.append('电信')
+    if len(filter_list) <= 1:
+        return []
+    filter_list += [''] * (8 - len(filter_list) % 8)
+    return [filter_list]
+
+
 def cellphone_filter(request):
     products = Cellphone.objects.all()
     filtered = []
@@ -127,6 +155,7 @@ def cellphone_filter(request):
     cpu = request.GET.get('cpu')
     ram = request.GET.get('ram')
     rom = request.GET.get('rom')
+    network_support = request.GET.get('network_support')
     if brand:
         products = products.filter(brand=brand)
         filtered.append(('品牌', 'brand', brand))
@@ -142,6 +171,9 @@ def cellphone_filter(request):
     if rom:
         products = products.filter(rom=rom)
         filtered.append(('ROM', 'rom', rom))
+    if network_support:
+        products = network_filter(products, network_support)
+        filtered.append(('网络支持', 'network_support', network_support))
     if color:
         products = products.filter(color=color)
         filtered.append(('机身颜色', 'color', color))
@@ -159,6 +191,8 @@ def cellphone_filter(request):
         filter_list.append(('RAM', 'ram', get_filter_list_sorted(products, 'ram')))
     if not rom:
         filter_list.append(('ROM', 'rom', get_filter_list_sorted(products, 'rom')))
+    if not network_support:
+        filter_list.append(('网络支持', 'network_support', get_network_filter_list(products)))
     if not color:
         filter_list.append(('机身颜色', 'color', get_filter_list(products, 'color')))
     if not platform:
