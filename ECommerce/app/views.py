@@ -169,12 +169,12 @@ def cellphone_filter(request):
     if rom:
         products = products.filter(rom=rom)
         filtered.append(('ROM', 'rom', rom))
-    if price_range:
-        products = price_range_filter(products, price_range)
-        filtered.append(('价格范围', 'price_range', price_range))
     if network_support:
         products = network_filter(products, network_support)
         filtered.append(('网络支持', 'network_support', network_support))
+    if price_range:
+        products = price_range_filter(products, price_range)
+        filtered.append(('价格范围', 'price_range', price_range))
     if color:
         products = products.filter(color=color)
         filtered.append(('机身颜色', 'color', color))
@@ -192,10 +192,10 @@ def cellphone_filter(request):
         filter_list.append(('RAM', 'ram', get_filter_list_sorted(products, 'ram')))
     if not rom:
         filter_list.append(('ROM', 'rom', get_filter_list_sorted(products, 'rom')))
-    if not price_range:
-        filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
     if not network_support:
         filter_list.append(('网络支持', 'network_support', get_network_filter_list(products)))
+    if not price_range:
+        filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
     if not color:
         filter_list.append(('机身颜色', 'color', get_filter_list(products, 'color')))
     if not platform:
