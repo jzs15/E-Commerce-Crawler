@@ -61,3 +61,15 @@ class Laptop(Product):
     graphic_card = StringField()
     weight = StringField()
     frequency = StringField()
+
+
+class Computer(Product):
+    color = StringField()
+    os = StringField()
+    core = StringField()
+    cpu = StringField()
+    ram = StringField()
+    rom = StringField()
+    rom_type = StringField()
+    graphic_card = StringField()
+    weight = StringField()
