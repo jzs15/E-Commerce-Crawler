@@ -182,3 +182,7 @@ h3 {
 .rating:not(:checked) > label:checked ~ label {
     color: #FFD700;
 }
+
+.category_table a{
+    color: black;
+}

@@ -66,14 +66,14 @@
         {% for product in products.object_list %}
             <tr>
                 <td>
-                    {% if product.image_url %}
-                        <img src="{{ product.image_url }}" width="50px" alt="">
+                    {% if product.image %}
+                        <img src="{{ product.image }}" width="50px" alt="">
                     {% else %}
                         <img src="{% static 'img/image_not_found.jpg' %}" width="50px" alt="">
                     {% endif %}
                 </td>
                 <td>{{ product.title }}</td>
-                <td>{{ product.product_name }}</td>
+                <td>{{ product.model }}</td>
                 <td>
                     {% if product.shop_name %}
                         {{ product.shop_name }}
@@ -81,11 +81,10 @@
                        -
                     {% endif %}
                 </td>
-                <td>{{ product.product_id }}</td>
                 <td>{{ product.brand }}</td>
                 <td>{{ product.price }}</td>
                 <td>{{ product.platform }}</td>
-                <td><a href="{{ product.product_url }}">{{ product.product_url }}</a></td>
+                <td><a href="{{ product.url }}">{{ product.url }}</a></td>
             </tr>
         {% endfor %}
     </table>

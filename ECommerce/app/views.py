@@ -16,22 +16,14 @@ def page_not_found(request):
 
 def search(request):
     page = request.GET.get('page')
-    sort1 = request.GET.get('sort1')
     search_string = request.GET.get('str')
-    thu = thulac.thulac()
-    words = thu.cut(search_string, text=True)
+    thu = thulac.thulac(seg_only=True)
+    words = thu.cut(search_string, text=True).split()
     q_object = Q()
     for word in words:
-        q_object |= (Q(title__icontains=word) | Q(product_name__icontains=word))
+        q_object |= (Q(title__icontains=word) | Q(model__icontains=word))
     items = Product.objects.filter(q_object)
-
-    if sort1 is '1':
-        items = items.order_by('price')
-    elif sort1 is '2':
-        items = items.order_by('-price')
-    else:
-        sort1 = 0
-
+    print(len(items))
     paginator = Paginator(items, 60)
     try:
         products = paginator.page(page)
@@ -39,13 +31,9 @@ def search(request):
         products = paginator.page(1)
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
-    a = 0
-    for pr in products:
-        a += 1
-        print(a, pr.shop_name, pr.product_id)
 
     return render(request, 'search.html', {'products': products, 'search_string': search_string,
-                                           'max_page': paginator.num_pages, 'sort1': sort1})
+                                           'max_page': paginator.num_pages})
 
 
 def get_filter_list(model, value):
@@ -95,12 +83,6 @@ def get_filter_list_sorted(model, value):
     if lst:
         lst += [''] * (8 - len(lst) % 8)
     return [lst[i:i + 8] for i in range(0, len(lst), 8)]
-
-
-def get_products_by_category(request, category):
-    if category == '手机':
-        return cellphone_filter(request)
-    return None
 
 
 def get_products_by_search(products, search_string):
@@ -201,6 +183,12 @@ def cellphone_filter(request):
     return products, filtered, filter_list
 
 
+def get_products_by_category(request, category):
+    if category == '手机':
+        return cellphone_filter(request)
+    return None, None, None
+
+
 def category_list_page(request):
     return render(request, 'categories.html')
 
@@ -262,6 +250,7 @@ def get_cellphone_detail(product):
         [('机身长度', product.height), ('机身宽度', product.width), ('机身厚度', product.thickness)],
         [('机身重量', product.weight), ('机身颜色', product.color)],
     ]
+
 
 def products_detail(request, product_id):
     product = Product.objects.filter(id=product_id).first()
