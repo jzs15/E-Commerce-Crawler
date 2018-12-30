@@ -260,3 +260,8 @@ def products_detail(request, product_id):
         detail_list = get_cellphone_detail(product)
 
     return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list})
+
+
+def compare_same_model(request, model, product_id):
+    product = model.objects.filter(id=product_id).first()
+    products = model.objects.filter(model=product.model)

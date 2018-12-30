@@ -32,3 +32,44 @@ class Cellphone(Product):
     frequency = StringField()
     screen_size = StringField()
     network_support = DictField()
+
+
+class Refrigerator(Product):
+    color = StringField()
+    open_method = StringField()
+    weather = StringField()
+    VoltFre = StringField()
+    rank = StringField()
+    ability = StringField()
+    method = StringField()
+    dB = StringField()
+    weight = StringField()
+    cold_volume = StringField()
+    ice_volume = StringField()
+    form_size = StringField()
+    case_size = StringField()
+
+
+class Laptop(Product):
+    color = StringField()
+    os = StringField()
+    core = StringField()
+    cpu = StringField()
+    ram = StringField()
+    rom = StringField()
+    rom_type = StringField()
+    graphic_card = StringField()
+    weight = StringField()
+    frequency = StringField()
+
+
+class Computer(Product):
+    color = StringField()
+    os = StringField()
+    core = StringField()
+    cpu = StringField()
+    ram = StringField()
+    rom = StringField()
+    rom_type = StringField()
+    graphic_card = StringField()
+    weight = StringField()

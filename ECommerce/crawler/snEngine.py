@@ -15,6 +15,9 @@ class SDEngine:
         self.is_connect = False
         self.common_info_list = ['image', 'title', 'price', 'comment_num', 'score', 'shop_name', 'url']
         self.cellphone_info_list = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
+        self.refrigerator_info_list = ['brand', 'model', 'date', 'color', 'open_method', 'weather', 'VoltFre', 'rank', 'ability', 'method', 'dB', 'weight', 'cold_volume', 'ice_volume', 'form_size', 'case_size']
+        self.laptop_info_list = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'rom', 'rom_type', 'graphic_card', 'weight', 'frequency']
+        self.computer_info_list = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'rom', 'rom_type','graphic_card', 'weight']
 
     @staticmethod
     def get_page_num(category):
@@ -22,6 +25,7 @@ class SDEngine:
         etree = lxml.html.etree
         root = etree.HTML(res.text)
         return int(root.xpath('//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[-1].attrib['pagenum'])
+
 
     @staticmethod
     def get_id_list(page_num, category):
@@ -38,13 +42,24 @@ class SDEngine:
         return id_list
 
 
-    def init_dict(self, m_dict):
+    def init_dict(self, m_dict, model):
         for i in self.common_info_list:
             m_dict[i] = 'None'
-        for i in self.cellphone_info_list:
-            m_dict[i] = 'None'
+        if model == Cellphone:
+            for i in self.cellphone_info_list:
+                m_dict[i] = 'None'
+            m_dict['network_support'] = {'china_mobile': False, 'china_unicom': False, 'china_telecom': False,
+                                         'all_kind': False}
+        elif model == Refrigerator:
+            for i in self.refrigerator_info_list:
+                m_dict[i] = 'None'
+        elif model == Laptop:
+            for i in self.laptop_info_list:
+                m_dict[i] = 'None'
+        elif model == Computer:
+            for i in self.computer_info_list:
+                m_dict[i] = 'None'
         m_dict['platform'] = '苏宁'
-        m_dict['network_support'] = {'china_mobile': False, 'china_unicom': False, 'china_telecom': False, 'all_kind': False}
 
 
     def save_to_db(self, m_dict, model):
@@ -134,26 +149,179 @@ class SDEngine:
                 m_dict['network_support'] = self.get_network_info(val.get_attribute('innerHTML'))
 
 
+    def refrigerator_crawler(self, driver, m_dict):
+        driver.find_element_by_xpath('//li[@id="productParTitle"]/a').click()
+        items = driver.find_elements_by_xpath("//tr[@parametercode]")
+        for item in items:
+            try:
+                name = item.find_element_by_xpath('.//td[@class="name"]/div/span').get_attribute('innerHTML')
+            except NoSuchElementException:
+                continue
+            val = item.find_element_by_xpath('.//td[@class="val"]')
+            if name == '品牌':
+                try:
+                    m_dict['brand'] = val.find_element_by_xpath('.//a').get_attribute('innerHTML')
+                except NoSuchElementException:
+                    m_dict['brand'] = val.get_attribute('innerHTML')
+            elif name == '型号':
+                m_dict['model'] = val.get_attribute('innerHTML')
+            elif name == '上市时间':
+                date = val.get_attribute('innerHTML')
+                if '月' in date:
+                    date = date.replace('年', '.').replace('月', '')
+                else:
+                    date = date.replace('年', '')
+                if '.' in date:
+                    index = date.find('.')
+                    date = date[:index + 1] + '0' + date[index + 1:]
+                m_dict['date'] = date
+            elif name == '颜色':
+                m_dict['color'] = val.get_attribute('innerHTML')
+            elif name == '开门方式':
+                m_dict['open_method'] = val.get_attribute('innerHTML')
+            elif name == '气候类型':
+                m_dict['weather'] = val.get_attribute('innerHTML')
+            elif name == '电压/频率':
+                m_dict['VoltFre'] = val.get_attribute('innerHTML')
+            elif name == '国家能效等级':
+                m_dict['rank'] = val.get_attribute('innerHTML')
+            elif name == '冷冻能力':
+                m_dict['ability'] = val.get_attribute('innerHTML')
+            elif name == '制冷方式':
+                m_dict['method'] = val.get_attribute('innerHTML')
+            elif name == '运转音dB(A)':
+                m_dict['dB'] = val.get_attribute('innerHTML')
+            elif name == '产品重量':
+                m_dict['weight'] = val.get_attribute('innerHTML')
+            elif name == '冷藏室容积':
+                m_dict['cold_volume'] = val.get_attribute('innerHTML')
+            elif name == '冷冻室容积':
+                m_dict['ice_volume'] = val.get_attribute('innerHTML')
+            elif name == '外形尺寸（宽*深*高）':
+                m_dict['form_size'] = val.get_attribute('innerHTML')
+            elif name == '包装尺寸（宽*深*高）':
+                m_dict['case_size'] = val.get_attribute('innerHTML')
+
+
+    def laptop_crawler(self, driver, m_dict):
+        driver.find_element_by_xpath('//li[@id="productParTitle"]/a').click()
+        items = driver.find_elements_by_xpath("//tr[@parametercode]")
+        for item in items:
+            try:
+                name = item.find_element_by_xpath('.//td[@class="name"]/div/span').get_attribute('innerHTML')
+            except NoSuchElementException:
+                continue
+            val = item.find_element_by_xpath('.//td[@class="val"]')
+            if name == '品牌':
+                try:
+                    m_dict['brand'] = val.find_element_by_xpath('.//a').get_attribute('innerHTML')
+                except NoSuchElementException:
+                    m_dict['brand'] = val.get_attribute('innerHTML')
+            elif name == '型号':
+                m_dict['model'] = val.get_attribute('innerHTML')
+            elif name == '上市时间':
+                date = val.get_attribute('innerHTML')
+                if '月' in date:
+                    date = date.replace('年', '.').replace('月', '')
+                else:
+                    date = date.replace('年', '')
+                if '.' in date:
+                    index = date.find('.')
+                    date = date[:index + 1] + '0' + date[index + 1:]
+                m_dict['date'] = date
+            elif name == '操作系统':
+                m_dict['os'] = val.get_attribute('innerHTML')
+            elif name == '颜色':
+                m_dict['color'] = val.get_attribute('innerHTML')
+            elif name == '核心数':
+                m_dict['core'] = val.get_attribute('innerHTML')
+            elif name == 'CPU型号':
+                m_dict['cpu'] = val.get_attribute('innerHTML')
+            elif name == '内存容量':
+                m_dict['ram'] = val.get_attribute('innerHTML')
+            elif name == '硬盘容量':
+                m_dict['rom'] = val.get_attribute('innerHTML')
+            elif name == '硬盘类型':
+                m_dict['rom_type'] = val.get_attribute('innerHTML')
+            elif name == '显卡型号':
+                m_dict['graphic_card'] = val.get_attribute('innerHTML')
+            elif name == '重量':
+                m_dict['weight'] = val.get_attribute('innerHTML')
+            elif name == '屏幕分辨率':
+                m_dict['frequency'] = val.get_attribute('innerHTML')
+
+
+    def computer_crawler(self, driver, m_dict):
+        driver.find_element_by_xpath('//li[@id="productParTitle"]/a').click()
+        items = driver.find_elements_by_xpath("//tr[@parametercode]")
+        for item in items:
+            try:
+                name = item.find_element_by_xpath('.//td[@class="name"]/div/span').get_attribute('innerHTML')
+            except NoSuchElementException:
+                continue
+            val = item.find_element_by_xpath('.//td[@class="val"]')
+            if name == '品牌':
+                try:
+                    m_dict['brand'] = val.find_element_by_xpath('.//a').get_attribute('innerHTML')
+                except NoSuchElementException:
+                    m_dict['brand'] = val.get_attribute('innerHTML')
+            elif name == '型号':
+                m_dict['model'] = val.get_attribute('innerHTML')
+            elif name == '上市时间':
+                date = val.get_attribute('innerHTML')
+                if '月' in date:
+                    date = date.replace('年', '.').replace('月', '')
+                else:
+                    date = date.replace('年', '')
+                if '.' in date:
+                    index = date.find('.')
+                    date = date[:index + 1] + '0' + date[index + 1:]
+                m_dict['date'] = date
+            elif name == '操作系统':
+                m_dict['os'] = val.get_attribute('innerHTML')
+            elif name == '颜色':
+                m_dict['color'] = val.get_attribute('innerHTML')
+            elif name == '核心数':
+                m_dict['core'] = val.get_attribute('innerHTML')
+            elif name == 'CPU型号':
+                m_dict['cpu'] = val.get_attribute('innerHTML')
+            elif name == '内存容量':
+                m_dict['ram'] = val.get_attribute('innerHTML')
+            elif name == '硬盘容量':
+                m_dict['rom'] = val.get_attribute('innerHTML')
+            elif name == '硬盘类型':
+                m_dict['rom_type'] = val.get_attribute('innerHTML')
+            elif name == '显卡型号':
+                m_dict['graphic_card'] = val.get_attribute('innerHTML')
+            elif name == '重量':
+                m_dict['weight'] = val.get_attribute('innerHTML')
+
+
     def crawling(self, category):
-        page_num = 1 #self.get_page_num(category)
+        page_num = self.get_page_num(category)
         crawler = None
         model = None
         if category == '0-20002-':
             crawler = self.cellphone_crawler
             model = Cellphone
-        id_list = self.get_id_list(page_num, category)
+        elif category == '0-244005-':
+            crawler = self.refrigerator_crawler
+            model = Refrigerator
+        elif category == '0-258004-':
+            crawler = self.laptop_crawler
+            model = Laptop
+        elif category == '0-258009-':
+            crawler = self.computer_crawler
+            model = Computer
+        else:
+            return
+        id_list = self.get_id_list(1, category)
         info = dict()
         driver = webdriver.Chrome()
-        num = 1
         for id in id_list:
-            self.init_dict(info)
+            self.init_dict(info, model)
             url = "https://product.suning.com/" + id + ".html"
             info['url'] = url
-
-            print(num)
-            print(url)
-            num += 1
-
             driver.get(url)
             try:
                 self.get_common_info(driver, info)
@@ -192,7 +360,10 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     sd = SDEngine()
-    sd.crawling('0-20002-')
+    #sd.crawling('0-20002-')    #cellphone
+    #sd.crawling('0-244005-')   #refrigerator
+    #sd.crawling('0-258004-')   #laptop
+    #sd.crawling('0-258009-')   #computer
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
 
 
