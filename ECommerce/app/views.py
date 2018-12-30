@@ -243,6 +243,31 @@ def products_filter(request, category):
                                                     'sort_list': sort_list, 'common': common})
 
 
-def compare(request, product_id):
+def get_cellphone_detail(product):
+    net = product.network_support
+    network_support = ''
+    if 'all_kind' in net:
+        network_support = '全网通'
+    else:
+        if 'china_mobile' in net:
+            network_support += '移动'
+        if 'china_unicom' in net:
+            network_support += '联通'
+        if 'china_telecom' in net:
+            network_support += '电信'
+    return [
+        [('品牌', product.brand), ('上市时间', product.date), ('网络支持', network_support)],
+        [('操作系统', product.os), ('屏幕尺寸', product.screen_size), ('分辨率', product.frequency)],
+        [('CPU', product.cpu), ('存储内存', product.rom), ('运行内存', product.ram)],
+        [('机身长度', product.height), ('机身宽度', product.width), ('机身厚度', product.thickness)],
+        [('机身重量', product.weight), ('机身颜色', product.color)],
+    ]
+
+def products_detail(request, product_id):
     product = Product.objects.filter(id=product_id).first()
-    return render(request, 'compare.html', {'product': product, 'items': product.items})
+    type_name = type(product).__name__
+    detail_list = []
+    if type_name == 'Cellphone':
+        detail_list = get_cellphone_detail(product)
+
+    return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list})

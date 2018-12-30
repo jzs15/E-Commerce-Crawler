@@ -1,43 +1,49 @@
-.index_search{
+@import url(//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css);
+
+h3 {
+    font-family: "Microsoft YaHei";
+}
+
+.index_search {
     height: 40em;
     display: flex;
     align-items: center;
     justify-content: center
 }
 
-.search_search{
+.search_search {
     height: 5em;
     display: flex;
     align-items: center;
     justify-content: center
 }
 
-.index_search form{
+.index_search form {
     width: 40%;
     margin: 0;
 }
 
-.search_search .input-group{
+.search_search .input-group {
     width: 60%;
     margin: 0;
 }
 
-.search_table{
+.search_table {
     display: flex;
     align-items: center;
     justify-content: center
 }
 
-.search_table table{
+.search_table table {
     width: 80%;
     margin: 0;
 }
 
-.gray_body{
+.gray_body {
     background-color: #eee;
 }
 
-.filter_mid{
+.filter_mid {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -57,19 +63,19 @@
 }
 
 .page_not_found {
-    padding:0;
-    margin:0
+    padding: 0;
+    margin: 0
 }
 
-.filtered{
-    float:left;
-    border: 1px solid  #E85708;
+.filtered {
+    float: left;
+    border: 1px solid #E85708;
     font-size: small;
     padding: 2px;
     margin: 4px;
 }
 
-.filtered a{
+.filtered a {
     color: #E85708;
 }
 
@@ -78,7 +84,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-     background-color: #fff;
+    background-color: #fff;
 }
 
 .filter_head_mid {
@@ -88,16 +94,16 @@
     display: table;
 }
 
-.filter_select th{
+.filter_select th {
     vertical-align: middle;
 }
 
 .total {
     vertical-align: middle;
-    float:right;
+    float: right;
 }
 
-.total b{
+.total b {
     color: red;
 }
 
@@ -109,4 +115,70 @@
     width: 60%;
     display: table-cell;
     vertical-align: middle;
+}
+
+.detail_table {
+    border: solid 15px white;
+}
+
+.to_buy_jd {
+    float: right;
+    color: white;
+
+    background: #C81522;
+    margin: auto 0;
+    border: #C81522 solid 1px;
+}
+
+.to_buy_sn {
+    float: right;
+    color: #FF8200;
+    margin: auto 0;
+    border: #262b31 solid 1px;
+}
+
+.to_buy_tb {
+    float: right;
+    color: #FF8200;
+    margin: auto 0;
+    border: #262b31 solid 1px;
+}
+
+.to_buy_az {
+    float: right;
+    color: #262b31;
+    margin: auto 0;
+    border: #FF8200 solid 1px;
+}
+
+.rating {
+    border: none;
+    float: left;
+}
+
+.rating > input {
+    display: none;
+}
+
+.rating > label:before {
+    margin: 1px;
+    font-size: 1em;
+    font-family: FontAwesome;
+    display: inline-block;
+    content: "\f005";
+}
+
+.rating > .half:before {
+    content: "\f089";
+    position: absolute;
+}
+
+.rating > label {
+    color: #ddd;
+    float: right;
+}
+
+.rating > input:checked ~ label,
+.rating:not(:checked) > label:checked ~ label {
+    color: #FFD700;
 }

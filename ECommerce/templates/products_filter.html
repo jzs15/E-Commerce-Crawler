@@ -1,180 +1,185 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>全网比价--{{ category }}</title>
-    {% load bootstrap4 %}
-    {% load static %}
-    {% bootstrap_css %}
-    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
-    <link rel="stylesheet" href="{% static 'css/style.css' %}">
-    <script type="text/javascript" src="{% static 'js/products_filter.js' %}">
-    </script>
-</head>
-<body class="gray_body">
-<div class="filter_head">
-    <div class="filter_head_mid">
-        <a href="/"><img src="{% static 'img/logo.png' %}" alt="" width="160px" height="75px"></a>
-        <form method="get" action="{% url 'products_filter' category %}" class="search_head">
-            <div class="input-group">
-                <input type="text" class="form-control" name="str" placeholder="Search...">
-                <div class="input-group-append">
-                    <button class="input-group-text" id="basic-addon2">搜索</button>
-                </div>
-            </div>
-        </form>
-    </div>
-</div>
-<div class="filter_mid filter_select">
-    <table class="table">
-        <tr>
-            {% if filtered %}
-                <th width="10%">
-                    您已选择：
-                </th>
-                <td colspan="10">
-                    {% for name_cn, name_en, value in filtered %}
-                        <div class="filtered">{{ name_cn }}:<a href="#"
-                                                               onclick="RemoveFilter('{{ name_en }}')">{{ value }}x</a>
-                        </div>
-                    {% endfor %}
-                </td>
-            {% else %}
-                <th width="10%">
-                    筛选商品
-                </th>
-            {% endif %}
-        </tr>
-        {% for name_cn, name_en, values_list in filter_list %}
-            {% for values in values_list %}
-                <tr>
-                    {% if forloop.first %}
-                        <th width="10%" id="filter_name_{{ forloop.parentloop.counter0 }}" rowspan="1"
-                            style="vertical-align: top;">
-                            {{ name_cn }}：
-                        </th>
-                        {% for value in values %}
-                            <td width="10%">
-                                <a href="#" onclick="AddFilter('{{ name_en }}', '{{ value }}')">{{ value }}</a>
-                            </td>
+{% extends 'products_base.html' %}
+{% load static %}
+{% block content %}
+    <div class="filter_mid filter_select">
+        <table class="table">
+            <tr>
+                {% if filtered %}
+                    <th width="10%">
+                        您已选择：
+                    </th>
+                    <td colspan="10">
+                        {% for name_cn, name_en, value in filtered %}
+                            <div class="filtered">{{ name_cn }}:<a href="#"
+                                                                   onclick="RemoveFilter('{{ name_en }}')">{{ value }}x</a>
+                            </div>
                         {% endfor %}
-                        {% if  values_list|length > 1 %}
-                            <td width="10%">
-                                <a href="#"
-                                   onclick="searchChange('{{ forloop.parentloop.counter0 }}', '{{ values_list|length }}')"
-                                   id="open_{{ forloop.parentloop.counter0 }}">更多↓</a>
-                            </td>
+                    </td>
+                {% else %}
+                    <th width="10%">
+                        筛选商品
+                    </th>
+                {% endif %}
+            </tr>
+            {% for name_cn, name_en, values_list in filter_list %}
+                {% for values in values_list %}
+                    <tr>
+                        {% if forloop.first %}
+                            <th width="10%" id="filter_name_{{ forloop.parentloop.counter0 }}" rowspan="1"
+                                style="vertical-align: top;">
+                                {{ name_cn }}：
+                            </th>
+                            {% for value in values %}
+                                <td width="10%">
+                                    <a href="#" onclick="AddFilter('{{ name_en }}', '{{ value }}')">{{ value }}</a>
+                                </td>
+                            {% endfor %}
+                            {% if  values_list|length > 1 %}
+                                <td width="10%">
+                                    <a href="#"
+                                       onclick="searchChange('{{ forloop.parentloop.counter0 }}', '{{ values_list|length }}')"
+                                       id="open_{{ forloop.parentloop.counter0 }}">更多↓</a>
+                                </td>
+                            {% else %}
+                                <td width="10%">
+                                </td>
+                            {% endif %}
                         {% else %}
-                            <td width="10%">
-                            </td>
+                            {% for value in values %}
+                                <td width="10%" class="hide_table_{{ forloop.parentloop.parentloop.counter0 }}"
+                                    style="display: none">
+                                    <a href="#" onclick="AddFilter('{{ name_en }}', '{{ value }}')">{{ value }}</a>
+                                </td>
+                            {% endfor %}
                         {% endif %}
-                    {% else %}
-                        {% for value in values %}
-                            <td width="10%" class="hide_table_{{ forloop.parentloop.parentloop.counter0 }}"
-                                style="display: none">
-                                <a href="#" onclick="AddFilter('{{ name_en }}', '{{ value }}')">{{ value }}</a>
-                            </td>
-                        {% endfor %}
-                    {% endif %}
+                    </tr>
+                {% endfor %}
+            {% endfor %}
+        </table>
+    </div>
+    <div class="filter_mid">
+        <table class="table">
+            <tr>
+                <td colspan="4">
+                    <div class="btn-group" role="group" aria-label="Basic example" data-toggle="buttons">
+                        {% if common is None %}
+                            <button onclick="AddFilter('common','true')" type="button"
+                                    class="btn btn-outline-info btn-sm">
+                                默认排序
+                            </button>
+                            {% for key, value in sort_list.items %}
+                                {% if value.1 == 'up' %}
+                                    <button onclick="AddFilter('{{ key }}','down')" type="button"
+                                            class="btn btn-outline-info btn-sm"
+                                            style="background-color: #17a2b8;color: #FFFFFF">{{ value.0 }}↑
+                                    </button>
+                                {% elif value.1 == 'down' %}
+                                    <button onclick="AddFilter('{{ key }}','up')" type="button"
+                                            class="btn btn-outline-info btn-sm"
+                                            style="background-color: #17a2b8;color: #FFFFFF">{{ value.0 }}↓
+                                    </button>
+                                {% else %}
+                                    <button onclick="AddFilter('{{ key }}','up')" type="button"
+                                            class="btn btn-outline-info btn-sm">{{ value.0 }}</button>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <button onclick="AddFilter('common','true')" type="button"
+                                    class="btn btn-outline-info btn-sm"
+                                    style="background-color: #17a2b8;color: #FFFFFF">默认排序
+                            </button>
+                            {% for key, value in sort_list.items %}
+                                <button onclick="AddFilter('{{ key }}','up')" type="button"
+                                        class="btn btn-outline-info btn-sm">{{ value.0 }}</button>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="total">共<b>{{ total_result }}</b>款</div>
+                </td>
+                <td>
+                    <div style="float: right;">
+                        {% if products.has_previous %}
+                            <a href="#" onclick="EditPage('{{ products.previous_page_number }}')">&laquo;</a>
+                        {% else %}
+                            <a>&laquo;</a>
+                        {% endif %}
+                        <span>{{ products.number }}/{{ max_page }}</span>
+                        {% if products.has_next %}
+                            <a href="#" onclick="EditPage('{{ products.next_page_number }}')">&raquo;</a>
+                        {% else %}
+                            <a>&raquo;</a>
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
+            {% for product in products.object_list %}
+                <tr>
+                    <td>
+                        <img src="{{ product.image }}" width="160px" alt="">
+                    </td>
+                    <td>
+                        <p><a href="{% url 'products_detail' product.id %}">{{ product.model }}</a></p>
+                        <p>{{ product.title }}</p>
+                    </td>
+                    <td class="price" width="10%">
+                        {% if product.price >= 0 %}
+                            <p style="float: right;">¥{{ product.price }}</p>
+                        {% else %}
+                            <p style="float: right;">暂无报价</p>
+                        {% endif %}
+                    </td>
+                    <td width="15%">
+                        <div class="rating">评价：{{ product.comment_num }}人评论</div>
+                    <div class="rating">
+                        <input type="radio" {% if product.score == 5.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="five"/><label class="full" for="five"></label>
+                        <input type="radio" {% if product.score >= 4.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="four_half"/><label class="half"
+                                                                          for="four_half"></label>
+                        <input type="radio" {% if product.score >= 4.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="four"/><label class="full" for="four"></label>
+                        <input type="radio" {% if product.score >= 3.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="three_half"/><label class="half"
+                                                                           for="three_half"></label>
+                        <input type="radio" {% if product.score >= 3.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="three"/><label class="full" for="three"></label>
+                        <input type="radio" {% if product.score >= 2.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="two_half"/><label class="half"
+                                                                         for="two_half"></label>
+                        <input type="radio" {% if product.score >= 2.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="two"/><label class="full" for="two"></label>
+                        <input type="radio" {% if product.score >= 1.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="one_half"/><label class="half"
+                                                                         for="one_half"></label>
+                        <input type="radio" {% if product.score >= 1.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="one"/><label class="full" for="one"></label>
+                        <input type="radio" {% if product.score >= 0.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="zero_half"/><label class="half"
+                                                                          for="zero_half"></label>
+                    </div>
+                    <div class="rating">
+                        {{ product.score|floatformat:-2 }}分
+                    </div>
+                    </td>
+                    <td width="20%" colspan="2">
+                        {% if product.platform == '京东' %}
+                            <p align="right"><img src="{% static 'img/jd.ico' %}" alt="" width="15px">京东商城</p>
+                        {% elif product.platform == '苏宁' %}
+                            <p align="right"><img src="{% static 'img/sn.ico' %}" alt="" width="15px">苏宁易购</p>
+                        {% elif product.platform == '淘宝' %}
+                            <p align="right"><img src="{% static 'img/tb.ico' %}" alt="" width="15px">淘宝</p>
+                        {% elif product.platform == '亚马逊' %}
+                            <p align="right"><img src="{% static 'img/az.ico' %}" alt="" width="15px">中国亚马逊</p>
+                        {% endif %}
+                        <p align="right">{{ product.shop_name }}</p>
+                    </td>
+                </tr>
+                <tr>
 
                 </tr>
             {% endfor %}
-        {% endfor %}
-    </table>
-</div>
-<div class="filter_mid">
-    <table class="table">
-        <tr>
-            <td colspan="4">
-                <div class="btn-group" role="group" aria-label="Basic example" data-toggle="buttons">
-                    {% if common is None %}
-                        <button onclick="AddFilter('common','true')" type="button" class="btn btn-outline-info btn-sm">
-                            默认排序
-                        </button>
-                        {% for key, value in sort_list.items %}
-                            {% if value.1 == 'up' %}
-                                <button onclick="AddFilter('{{ key }}','down')" type="button"
-                                        class="btn btn-outline-info btn-sm"
-                                        style="background-color: #17a2b8;color: #FFFFFF">{{ value.0 }}↑
-                                </button>
-                            {% elif value.1 == 'down' %}
-                                <button onclick="AddFilter('{{ key }}','up')" type="button"
-                                        class="btn btn-outline-info btn-sm"
-                                        style="background-color: #17a2b8;color: #FFFFFF">{{ value.0 }}↓
-                                </button>
-                            {% else %}
-                                <button onclick="AddFilter('{{ key }}','up')" type="button"
-                                        class="btn btn-outline-info btn-sm">{{ value.0 }}</button>
-                            {% endif %}
-                        {% endfor %}
-                    {% else %}
-                        <button onclick="AddFilter('common','true')" type="button" class="btn btn-outline-info btn-sm"
-                                style="background-color: #17a2b8;color: #FFFFFF">默认排序
-                        </button>
-                        {% for key, value in sort_list.items %}
-                            <button onclick="AddFilter('{{ key }}','up')" type="button"
-                                    class="btn btn-outline-info btn-sm">{{ value.0 }}</button>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            </td>
-            <td>
-                <div class="total">共<b>{{ total_result }}</b>款</div>
-            </td>
-            <td>
-                <div style="float: right;">
-                    {% if products.has_previous %}
-                        <a href="#" onclick="EditPage('{{ products.previous_page_number }}')">&laquo;</a>
-                    {% else %}
-                        <a>&laquo;</a>
-                    {% endif %}
-                    <span>{{ products.number }}/{{ max_page }}</span>
-                    {% if products.has_next %}
-                        <a href="#" onclick="EditPage('{{ products.next_page_number }}')">&raquo;</a>
-                    {% else %}
-                        <a>&raquo;</a>
-                    {% endif %}
-                </div>
-            </td>
-        </tr>
-        {% for product in products.object_list %}
-            <tr>
-                <td>
-                    <img src="{{ product.image }}" width="160px" alt="">
-                </td>
-                <td>
-                    <p><a href="{{ product.url }}">{{ product.model }}</a></p>
-                    <p>{{ product.title }}</p>
-                </td>
-                <td class="price" width="10%">
-                    {% if product.price >= 0 %}
-                        <p style="float: right;">¥{{ product.price }}</p>
-                    {% else %}
-                        <p style="float: right;">暂无报价</p>
-                    {% endif %}
-                </td>
-                <td width="15%">
-                    <p style="float: right;">
-                        有{{ product.comment_num }}人评论</p>
-                </td>
-                <td width="20%" colspan="2">
-                    {% if product.platform == '京东' %}
-                        <p align="right"><img src="{% static 'img/jd.ico' %}" alt="" width="15px">京东商城</p>
-                    {% elif product.platform == '苏宁' %}
-                        <p align="right"><img src="{% static 'img/sn.ico' %}" alt="" width="15px">苏宁易购</p>
-                    {% elif product.platform == '淘宝' %}
-                        <p align="right"><img src="{% static 'img/tb.ico' %}" alt="" width="15px">淘宝</p>
-                    {% elif product.platform == '亚马逊' %}
-                        <p align="right"><img src="{% static 'img/az.ico' %}" alt="" width="15px">中国亚马逊</p>
-                    {% endif %}
-                    <p align="right">{{ product.shop_name }}</p>
-                </td>
-            </tr>
-            <tr>
-
-            </tr>
-        {% endfor %}
-    </table>
-</div>
-</body>
-</html>
+        </table>
+    </div>
+{% endblock %}
