@@ -48,3 +48,16 @@ class Refrigerator(Product):
     ice_volume = StringField()
     form_size = StringField()
     case_size = StringField()
+
+
+class Laptop(Product):
+    color = StringField()
+    os = StringField()
+    core = StringField()
+    cpu = StringField()
+    ram = StringField()
+    rom = StringField()
+    rom_type = StringField()
+    graphic_card = StringField()
+    weight = StringField()
+    frequency = StringField()
