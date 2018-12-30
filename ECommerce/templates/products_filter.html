@@ -9,27 +9,6 @@
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script type="text/javascript" src="{% static 'js/products_filter.js' %}">
     </script>
-    <script type="text/javascript">
-        function searchChange(num, col) {
-            open_elem = document.getElementById("open_" + num);
-            if (open_elem.innerText === "更多↓") {
-                let hide_tables = document.getElementsByClassName("hide_table_" + num);
-                for (let i = 0; i < hide_tables.length; i++) {
-                    hide_tables[i].removeAttribute("style");
-                }
-                document.getElementById("filter_name_" + num).setAttribute("rowspan", col);
-                open_elem.innerText = "收缩↑";
-            } else {
-                let hide_tables = document.getElementsByClassName("hide_table_" + num);
-                for (let i = 0; i < hide_tables.length; i++) {
-                    hide_tables[i].style.display = "none";
-                }
-                document.getElementById("filter_name_" + num).setAttribute("rowspan", 1);
-                open_elem.innerText = "更多↓";
-            }
-            return false;
-        }
-    </script>
 </head>
 <body class="gray_body">
 <div class="filter_mid">
