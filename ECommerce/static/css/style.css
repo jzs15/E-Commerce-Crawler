@@ -74,6 +74,14 @@
 }
 
 .filter_head {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+     background-color: #fff;
+}
+
+.filter_head_mid {
     width: 80%;
     margin: 0;
     background-color: #fff;

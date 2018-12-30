@@ -2,18 +2,19 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>全网比价--{{ category }}</title>
     {% load bootstrap4 %}
     {% load static %}
     {% bootstrap_css %}
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
     <script type="text/javascript" src="{% static 'js/products_filter.js' %}">
     </script>
 </head>
 <body class="gray_body">
-<div class="filter_mid">
-    <div class="filter_head">
-        <img src="{% static 'img/image_not_found.jpg' %}" alt="" width="160px" height="75px">
+<div class="filter_head">
+    <div class="filter_head_mid">
+        <a href="/"><img src="{% static 'img/logo.png' %}" alt="" width="160px" height="75px"></a>
         <form method="get" action="{% url 'products_filter' category %}" class="search_head">
             <div class="input-group">
                 <input type="text" class="form-control" name="str" placeholder="Search...">
