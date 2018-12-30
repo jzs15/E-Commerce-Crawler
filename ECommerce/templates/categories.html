@@ -1,53 +1,62 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <title>案件一覧</title>
-
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 50%;
-        }
-
-        th {
-            border: 1px solid black;
-        }
-
-        td {
-            border: 1px solid black;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <title>全网比价--{{ category }}</title>
+    {% load bootstrap4 %}
+    {% load static %}
+    {% bootstrap_css %}
+    <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'iconfont/iconfont.css' %}">
+    <script type="text/javascript" src="{% static 'js/products_filter.js' %}">
+    </script>
 </head>
-<body>
-<table id="t_table">
-    <tr id="tr1">
-        <th colspan="1">
-            <a id="searchChange" onclick="return searchChange()" href="">－</a>
-        </th>
-        <th colspan="4">
-            title
-        </th>
-    </tr>
-    <tr id="tr2">
-        <td rowspan="3"> </td>
-        <td>5</td>
-        <td>6</td>
-        <td>7</td>
-        <td>8</td>
-    </tr>
-    <tr id="tr3">
-        <td>apple</td>
-        <td>bags</td>
-        <td>balana</td>
-        <td>orange</td>
-    </tr>
-    <tr id="tr4">
-        <td>1</td>
-        <td>2</td>
-        <td>3</td>
-        <td>4</td>
-    </tr>
-</table>
-<input type="hidden" name="searchChangeFlg" id="searchChangeFlg" value="0"/>
+<body class="gray_body">
+<div class="filter_head">
+    <div class="filter_head_mid">
+        <a href="/"><img src="{% static 'img/logo.png' %}" alt="" width="160px" height="75px"></a>
+        <form method="get" action="{% url 'search' %}" class="search_head">
+            <div class="input-group">
+                <input type="text" class="form-control" name="str" placeholder="Search...">
+                <div class="input-group-append">
+                    <button class="input-group-text" id="basic-addon2">搜索</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+<div class="filter_mid">
+    <table class="table category_table">
+        <tr>
+            <td width="25%">
+                <a class="icon iconfont icon-shouji" href="{% url 'products_filter' '手机' %}">手机</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-bijiben" href="{% url 'products_filter' '笔记本' %}">笔记本</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-taishidiannao" href="{% url 'products_filter' '台式电脑' %}">台式电脑</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-pingbandiannao" href="{% url 'products_filter' '平板电脑' %}">平板电脑</a>
+            </td>
+        </tr>
+        <tr>
+            <td width="25%">
+                <a class="icon iconfont icon-xiyiji" href="{% url 'products_filter' '洗衣机' %}">洗衣机</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-bingxiang" href="{% url 'products_filter' '冰箱' %}">冰箱</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-dianshiji" href="{% url 'products_filter' '电视机' %}">电视机</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-zhaoxiangji" href="{% url 'products_filter' '照相机' %}">照相机</a>
+            </td>
+        </tr>
+    </table>
+</div>
 </body>
 </html>

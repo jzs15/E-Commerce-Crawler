@@ -1,0 +1,70 @@
+{% extends 'products_base.html' %}
+{% load static %}
+{% block content %}
+    <div class="filter_mid">
+        <table class="detail_table">
+            <tr>
+                <th colspan="3"><h3><b>{{ product.model }}</b></h3></th>
+                <td>
+                    {% if product.platform == "京东" %}
+                        <a class="btn to_buy_jd" href="{{ product.url }}" role="button">去购买</a>
+                    {% elif product.platform == "苏宁" %}
+                        <a class="btn to_buy_sn" href="{{ product.url }}" role="button">去购买</a>
+                    {% elif product.platform == "淘宝" %}
+                        <a class="btn to_buy_tb" href="{{ product.url }}" role="button">去购买</a>
+                    {% elif product.platform == "亚马逊" %}
+                        <a class="btn to_buy_az" href="{{ product.url }}" role="button">去购买</a>
+                    {% endif %}
+                </td>
+            </tr>
+            <tr>
+                <td width="1" rowspan="{{ detail_list|length|add:2 }}"><img src="{{ product.image }}" alt=""
+                                                                            width="200px"></td>
+                <td colspan="3">价格：<b class="price">¥{{ product.price }}</b></td>
+            </tr>
+            <tr>
+                <td colspan="3">
+                    <div class="rating" style="padding-right: 10px">评价：{{ product.comment_num }}人评论</div>
+                    <div class="rating">
+                        <input type="radio" {% if product.score == 5.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="five"/><label class="full" for="five"></label>
+                        <input type="radio" {% if product.score >= 4.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="four_half"/><label class="half"
+                                                                          for="four_half"></label>
+                        <input type="radio" {% if product.score >= 4.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="four"/><label class="full" for="four"></label>
+                        <input type="radio" {% if product.score >= 3.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="three_half"/><label class="half"
+                                                                           for="three_half"></label>
+                        <input type="radio" {% if product.score >= 3.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="three"/><label class="full" for="three"></label>
+                        <input type="radio" {% if product.score >= 2.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="two_half"/><label class="half"
+                                                                         for="two_half"></label>
+                        <input type="radio" {% if product.score >= 2.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="two"/><label class="full" for="two"></label>
+                        <input type="radio" {% if product.score >= 1.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="one_half"/><label class="half"
+                                                                         for="one_half"></label>
+                        <input type="radio" {% if product.score >= 1.0 %} checked="checked" {% endif %}
+                               disabled="disabled" id="one"/><label class="full" for="one"></label>
+                        <input type="radio" {% if product.score >= 0.5 %} checked="checked" {% endif %}
+                               disabled="disabled" id="zero_half"/><label class="half"
+                                                                          for="zero_half"></label>
+                    </div>
+                    <div class="rating">
+                        {{ product.score|floatformat:-2 }}分
+                    </div>
+                </td>
+            </tr>
+            {% for values in detail_list %}
+                <tr>
+                    {% for name, value in values %}
+                        <td>{{ name }}: {{ value }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+{% endblock %}

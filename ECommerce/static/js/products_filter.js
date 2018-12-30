@@ -1,5 +1,3 @@
-sort_list = ['price', 'score', 'date', 'comment_num']
-
 function RemoveFilter(name) {
     let req = GetRequest();
     if (req.hasOwnProperty("page")) {
@@ -33,7 +31,8 @@ function AddFilter(name, value) {
             delete req["comment_num"];
         }
     }
-    for (var i in sort_list) {
+    let sort_list = ['price', 'score', 'date', 'comment_num'];
+    for (let i in sort_list) {
         if (sort_list[i] === name) {
             if (req.hasOwnProperty("common")) {
                 delete req["common"];
@@ -69,7 +68,7 @@ function GetRequest() {
 function ToHref(req) {
     let url = {};
     if (Object.keys(req).length === 0) {
-        url = "/products_filter";
+        url = location.pathname;
     } else {
         url = "?";
         for (let key in req) {
@@ -80,4 +79,24 @@ function ToHref(req) {
         url = url.substring(0, url.length - 1)
     }
     return url;
+}
+
+function searchChange(num, col) {
+    let open_elem = document.getElementById("open_" + num);
+    if (open_elem.innerText === "更多↓") {
+        let hide_tables = document.getElementsByClassName("hide_table_" + num);
+        for (let i = 0; i < hide_tables.length; i++) {
+            hide_tables[i].removeAttribute("style");
+        }
+        document.getElementById("filter_name_" + num).setAttribute("rowspan", col);
+        open_elem.innerText = "收缩↑";
+    } else {
+        let hide_tables = document.getElementsByClassName("hide_table_" + num);
+        for (let i = 0; i < hide_tables.length; i++) {
+            hide_tables[i].style.display = "none";
+        }
+        document.getElementById("filter_name_" + num).setAttribute("rowspan", 1);
+        open_elem.innerText = "更多↓";
+    }
+    return false;
 }
