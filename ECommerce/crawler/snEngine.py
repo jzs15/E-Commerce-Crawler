@@ -20,8 +20,10 @@ class SDEngine:
         self.refrigerator_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '气候类型', '电压/频率', '国家能效等级', '冷冻能力', '制冷方式', '运转音dB(A)', '产品重量', '冷藏室容积', '冷冻室容积', '外形尺寸（宽*深*高）', '包装尺寸（宽*深*高）']
         self.laptop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'rom', 'rom_type', 'graphic_card', 'weight', 'frequency']
         self.laptop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘容量', '硬盘类型', '显卡型号', '重量', '屏幕分辨率']
-        self.computer_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'rom', 'rom_type','graphic_card', 'weight']
-        self.computer_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘容量', '硬盘类型', '显卡型号', '重量']
+        self.desktop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'rom', 'rom_type','graphic_card', 'weight']
+        self.desktop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘容量', '硬盘类型', '显卡型号', '重量']
+        self.television_info_list_en = ['brand', 'model', 'tv_category', 'date', 'length', 'frequency', 'light', 'color', 'ratio', 'os', 'ram', 'rom', 'machine_power', 'wait_power', 'volt', 'size', 'weight']
+        self.television_info_list_cn = ['品牌', '产品型号', '电视类型', '上市时间', '屏幕尺寸', '屏幕分辨率', '光源类型', '产品颜色', '屏幕比例', '操作系统', 'RAM内存（DDR）', 'ROM存储（EMMC）', '整机功率（W）', '待机功率（W）', '电源电压', '单屏尺寸（宽*高*厚）', '单屏重量（KG）']
 
     @staticmethod
     def get_page_num(category):
@@ -60,8 +62,11 @@ class SDEngine:
         elif model == Laptop:
             for i in self.laptop_info_list_en:
                 m_dict[i] = 'None'
-        elif model == Computer:
-            for i in self.computer_info_list_en:
+        elif model == Desktop:
+            for i in self.desktop_info_list_en:
+                m_dict[i] = 'None'
+        elif model == Television:
+            for i in self.television_info_list_en:
                 m_dict[i] = 'None'
         m_dict['platform'] = '苏宁'
 
@@ -150,9 +155,13 @@ class SDEngine:
             info_list_cn = self.laptop_info_list_cn
             model = Laptop
         elif category == '0-258009-':
-            info_list_en = self.computer_info_list_en
-            info_list_cn = self.computer_info_list_cn
-            model = Computer
+            info_list_en = self.desktop_info_list_en
+            info_list_cn = self.desktop_info_list_cn
+            model = Desktop
+        elif category == '0-293006-':
+            info_list_en = self.television_info_list_en
+            info_list_cn = self.television_info_list_cn
+            model = Television
         else:
             return
         id_list = self.get_id_list(1, category)
@@ -191,10 +200,11 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     sd = SDEngine()
-    sd.crawling('0-20002-')    #cellphone
-    sd.crawling('0-244005-')   #refrigerator
-    sd.crawling('0-258004-')   #laptop
-    sd.crawling('0-258009-')   #computer
+    #sd.crawling('0-20002-')    #cellphone
+    #sd.crawling('0-244005-')   #refrigerator
+    #sd.crawling('0-258004-')   #laptop
+    #sd.crawling('0-258009-')   #desktop
+    sd.crawling('0-293006-')   #television
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
 
 
