@@ -13,23 +13,38 @@ from multiprocessing import Pool, cpu_count
 class SDEngine:
     def __init__(self):
         self.is_connect = False
-        self.common_info_list = ['image', 'title', 'price', 'comment_num', 'score', 'shop_name', 'url']
-        self.cellphone_info_list_en = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
-        self.cellphone_info_list_cn = ['品牌', '型号', '上市时间', '手机操作系统', 'CPU品牌', '运行内存', '机身内存', '机身长度', '机身宽度', '机身厚度', '重量', '屏幕尺寸', '屏幕分辨率', '颜色', '4G网络制式']
-        self.refrigerator_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'weather', 'voltFre', 'rank', 'ability', 'method', 'dB', 'weight', 'cold_volume', 'ice_volume', 'form_size', 'case_size']
-        self.refrigerator_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '气候类型', '电压/频率', '国家能效等级', '冷冻能力', '制冷方式', '运转音dB(A)', '产品重量', '冷藏室容积', '冷冻室容积', '外形尺寸（宽*深*高）', '包装尺寸（宽*深*高）']
-        self.laptop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'rom', 'rom_type', 'graphic_card', 'weight', 'frequency']
-        self.laptop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘容量', '硬盘类型', '显卡型号', '重量', '屏幕分辨率']
-        self.computer_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'rom', 'rom_type','graphic_card', 'weight']
-        self.computer_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘容量', '硬盘类型', '显卡型号', '重量']
+        self.common_info_list = ['image', 'title', 'shop_name', 'url', 'price', 'comment_num', 'score']
+        self.cellphone_info_list_en = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width',
+                                       'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
+        self.cellphone_info_list_cn = ['品牌', '型号', '上市时间', '手机操作系统', 'CPU品牌', '运行内存', '机身内存', '机身长度', '机身宽度', '机身厚度',
+                                       '重量', '屏幕尺寸', '屏幕分辨率', '颜色', '4G网络制式']
+        self.refrigerator_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'weather', 'voltFre',
+                                          'rank', 'ability', 'method', 'dB', 'weight', 'cold_volume', 'ice_volume',
+                                          'form_size', 'case_size']
+        self.refrigerator_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '气候类型', '电压/频率', '国家能效等级', '冷冻能力', '制冷方式',
+                                          '运转音dB(A)', '产品重量', '冷藏室容积', '冷冻室容积', '外形尺寸（宽*深*高）', '包装尺寸（宽*深*高）']
+        self.laptop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd',
+                                    'graphic_card', 'weight', 'frequency']
+        self.laptop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号',
+                                    '重量', '屏幕分辨率']
+        self.desktop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd',
+                                     'graphic_card', 'weight']
+        self.desktop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号', '重量']
+        self.television_info_list_en = ['brand', 'model', 'tv_category', 'date', 'length', 'frequency', 'light',
+                                        'color', 'ratio', 'os', 'ram', 'rom', 'machine_power', 'wait_power', 'volt',
+                                        'size', 'weight']
+        self.television_info_list_cn = ['品牌', '产品型号', '电视类型', '上市时间', '屏幕尺寸', '屏幕分辨率', '光源类型', '产品颜色', '屏幕比例', '操作系统',
+                                        'RAM内存（DDR）', 'ROM存储（EMMC）', '整机功率（W）', '待机功率（W）', '电源电压', '单屏尺寸（宽*高*厚）',
+                                        '单屏重量（KG）']
 
     @staticmethod
     def get_page_num(category):
         res = requests.get("https://list.suning.com/" + category + "0" + ".html")
         etree = lxml.html.etree
         root = etree.HTML(res.text)
-        return int(root.xpath('//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[-1].attrib['pagenum'])
-
+        return int(root.xpath(
+            '//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[
+                       -1].attrib['pagenum'])
 
     @staticmethod
     def get_id_list(page_num, category):
@@ -45,26 +60,30 @@ class SDEngine:
                 id_list.append(id.get_attribute('id').replace('-', '/'))
         return id_list
 
-
     def init_dict(self, m_dict, model):
-        for i in self.common_info_list:
-            m_dict[i] = 'None'
+        for i in self.common_info_list[:4]:
+            m_dict[i] = ''
+        m_dict['price'] = -1
+        m_dict['comment_num'] = 0
+        m_dict['score'] = 0
         if model == Cellphone:
             for i in self.cellphone_info_list_en:
-                m_dict[i] = 'None'
+                m_dict[i] = ''
             m_dict['network_support'] = {'china_mobile': False, 'china_unicom': False, 'china_telecom': False,
                                          'all_kind': False}
         elif model == Refrigerator:
             for i in self.refrigerator_info_list_en:
-                m_dict[i] = 'None'
+                m_dict[i] = ''
         elif model == Laptop:
             for i in self.laptop_info_list_en:
-                m_dict[i] = 'None'
+                m_dict[i] = ''
         elif model == Desktop:
-            for i in self.computer_info_list_en:
-                m_dict[i] = 'None'
+            for i in self.desktop_info_list_en:
+                m_dict[i] = ''
+        elif model == Television:
+            for i in self.television_info_list_en:
+                m_dict[i] = ''
         m_dict['platform'] = '苏宁'
-
 
     def save_to_db(self, m_dict, model):
         if not self.is_connect:
@@ -77,15 +96,16 @@ class SDEngine:
         else:
             products.update(**m_dict)
 
-
     @staticmethod
     def get_common_info(driver, m_dict):
         infoMain = driver.find_element_by_class_name('proinfo-title')
         m_dict['image'] = driver.find_element_by_id('bigImg').find_element_by_xpath('.//img').get_attribute('src')
-        m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text.replace('自营', '').replace('\n', '')
+        m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text.replace('自营', '').replace(
+            '\n', '')
         m_dict['price'] = float(driver.find_element_by_class_name('mainprice').text.replace('¥', ''))
         try:
-            m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath('.//a').get_attribute('innerHTML')
+            m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath(
+                './/a').get_attribute('innerHTML')
         except:
             m_dict['shop_name'] = '苏宁自营'
 
@@ -96,12 +116,14 @@ class SDEngine:
             comment.find_element_by_xpath(".//li[@data-type='good']").get_attribute('data-num')) + 3 * int(
             comment.find_element_by_xpath(".//li[@data-type='normal']").get_attribute('data-num')) + int(
             comment.find_element_by_xpath(".//li[@data-type='bad']").get_attribute('data-num'))
-        m_dict['comment_num'] = int(comment.find_element_by_xpath(".//li[@data-type='total']").get_attribute('data-num'))
+        m_dict['comment_num'] = int(
+            comment.find_element_by_xpath(".//li[@data-type='total']").get_attribute('data-num'))
         m_dict['score'] = score / m_dict['comment_num']
         return
 
-
     def detail_info_crawler(self, driver, m_dict, info_list_en, info_list_cn):
+        disk_type = None
+        disk_size = None
         driver.find_element_by_xpath('//li[@id="productParTitle"]/a').click()
         items = driver.find_elements_by_xpath("//tr[@parametercode]")
         for item in items:
@@ -131,9 +153,21 @@ class SDEngine:
                 m_dict['date'] = date
             elif name == '4G网络制式':
                 m_dict['network_support'] = self.get_network_info(val.get_attribute('innerHTML'))
+            elif name == '硬盘类型':
+                disk_type = val.get_attribute('innerHTML')
+            elif name == '硬盘容量':
+                disk_size = val.get_attribute('innerHTML')
             else:
                 m_dict[info_list_en[index]] = val.get_attribute('innerHTML')
-
+        if disk_type and disk_size:
+            if disk_type == '机械硬盘':
+                m_dict['hdd'] = disk_size
+            elif disk_type == '固态硬盘':
+                m_dict['ssd'] = disk_size
+            elif disk_type == '混合硬盘':
+                size = disk_size.split('+')
+                m_dict['hdd'] = size[0]
+                m_dict['ssd'] = size[1]
 
     def crawling(self, category):
         page_num = self.get_page_num(category)
@@ -150,12 +184,16 @@ class SDEngine:
             info_list_cn = self.laptop_info_list_cn
             model = Laptop
         elif category == '0-258009-':
-            info_list_en = self.computer_info_list_en
-            info_list_cn = self.computer_info_list_cn
-            model = Computer
+            info_list_en = self.desktop_info_list_en
+            info_list_cn = self.desktop_info_list_cn
+            model = Desktop
+        elif category == '0-293006-':
+            info_list_en = self.television_info_list_en
+            info_list_cn = self.television_info_list_cn
+            model = Television
         else:
             return
-        id_list = self.get_id_list(1, category)
+        id_list = self.get_id_list(page_num, category)
         info = dict()
         driver = webdriver.Chrome()
         for id in id_list:
@@ -170,7 +208,6 @@ class SDEngine:
                 traceback.print_tb(e)
                 continue
             self.save_to_db(info, model)
-
 
     @staticmethod
     def get_network_info(net):
@@ -194,8 +231,9 @@ def main():
     sd.crawling('0-20002-')    #cellphone
     sd.crawling('0-244005-')   #refrigerator
     sd.crawling('0-258004-')   #laptop
-    sd.crawling('0-258009-')   #computer
-    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()) )
+    sd.crawling('0-258009-')   #desktop
+    sd.crawling('0-293006-')   #television
+    print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
 
 main()

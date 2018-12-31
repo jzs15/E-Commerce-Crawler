@@ -73,3 +73,21 @@ class Desktop(Product):
     ssd = StringField()
     graphic_card = StringField()
     weight = StringField()
+
+
+class Television(Product):
+    tv_category = StringField()
+    length = StringField()
+    frequency = StringField()
+    light = StringField()
+    color = StringField()
+    ratio = StringField()
+    os = StringField()
+    ram = StringField()
+    rom = StringField()
+    machine_power = StringField()
+    wait_power = StringField()
+    volt = StringField()
+    size = StringField()
+    weight = StringField()
+
