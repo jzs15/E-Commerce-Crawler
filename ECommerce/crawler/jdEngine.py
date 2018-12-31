@@ -21,11 +21,11 @@ class JDEngine:
                                        ('method', '制冷方式'), ('dB', '运转音dB(A)'), ('weight', '产品重量（kg）'),
                                        ('cold_volume', '冷藏室(升)'), ('ice_volume', '冷冻室(升)'),
                                        ('form_size', '产品尺寸（深x宽x高）mm'), ('case_size', '包装尺寸（深x宽x高）mm')]
-        self.laptop_info_list = [('color', '颜色'), ('os', '操作系统'), ('core', '核心'),
+        self.laptop_info_list = [('color', '颜色'), ('os', '操作系统'),
                                  ('cpu', 'CPU型号'), ('ram', '内存容量'),
                                  ('graphic_card', '显示芯片'), ('weight', '净重'),
                                  ('frequency', '物理分辨率')]
-        self.desktop_info_list = [('color', '颜色'), ('os', '操作系统'), ('core', '核心数'), ('cpu', 'CPU型号'),
+        self.desktop_info_list = [('color', '颜色'), ('os', '操作系统'), ('cpu', 'CPU型号'),
                                   ('graphic_card', '显示芯片'), ('weight', '重量')]
 
     def get_common_info(self, product_id, spider):
@@ -70,7 +70,7 @@ class JDEngine:
         else:
             detail = root.xpath(
                 "//h3[text()='{}']/following-sibling::*//dt[text()='{}']/following-sibling::*/text()".format(parent,
-                                                                                                            val))
+                                                                                                             val))
         return str(detail[-1]) if detail else ''
 
     @staticmethod
@@ -155,6 +155,20 @@ class JDEngine:
                     return t
         return ''
 
+    def get_core(self, root):
+        core = self.get_detail_info(root, '核心')
+        core = self.get_detail_info(root, '核心数') if not core else core
+        if core.isnumeric():
+            return core
+        ab = re.compile('(\d+)核').findall(core)
+        if ab:
+            return ab[0]
+        cn_list = ['零', '一', '双', '三', '四', '五', '六', '七', '八', '九', '十']
+        cn = re.compile('([\u4e00-\u9fa5]+)核').findall(core)
+        if cn:
+            return str(cn_list.index(cn[0]))
+        return ''
+
     def cellphone_spider(self, root):
         info = dict()
         for name, value in self.cellphone_info_list:
@@ -176,6 +190,7 @@ class JDEngine:
         info = dict()
         for name, value in self.laptop_info_list:
             info[name] = self.get_detail_info(root, value)
+        info['core'] = self.get_core(root)
         info['hdd'] = self.get_disk_info(root, '硬盘容量')
         info['ssd'] = self.get_disk_info(root, '固态硬盘')
         return info
@@ -184,16 +199,35 @@ class JDEngine:
         info = dict()
         for name, value in self.desktop_info_list:
             info[name] = self.get_detail_info(root, value)
-        info['ram'] = self.get_detail_info(root, '容量', '内存')
+        info['core'] = self.get_core(root)
+        info['ram'] = ''
+        ram = self.get_detail_info(root, '容量', '内存')
+        if ram:
+            ram_list = re.compile('\W*(\d*)').findall(ram)
+            ram = 0
+            for r in ram_list:
+                if r.isnumeric():
+                    ram += int(r)
+            info['ram'] = str(ram) + 'GB'
+
         rom = self.get_detail_info(root, '容量', '硬盘')
-        rom = rom.split('；')
         info['hdd'] = ''
         info['ssd'] = ''
-        for r in rom:
-            if r.find('SSD') != -1:
-                info['hdd'] = r
-            else:
-                info['ssd'] = r.split(' ')[0]
+        if rom:
+            ssd_list = ['GSSD', 'G SSD', 'GBSSD', 'GB SSD',
+                        'TSSD', 'T SSD', 'TBSSD', 'TB SSD']
+            for i in range(len(ssd_list)):
+                ssd = re.compile('\W*(\d*)' + ssd_list[i]).findall(rom)
+                if ssd:
+                    info['ssd'] = ssd[-1] + 'GB' if i <= 3 else ssd[-1] + 'TB'
+                    rom = rom.replace(ssd[-1] + ssd_list[i], '')
+                    break
+            hdd_list = ['G', 'T']
+            for i in range(len(hdd_list)):
+                hdd = re.compile('\W*(\d*)' + hdd_list[i]).findall(rom)
+                if hdd:
+                    info['hdd'] = hdd[-1] + 'GB' if i == 0 else hdd[-1] + 'TB'
+                    break
         return info
 
     def crawler(self, cat):

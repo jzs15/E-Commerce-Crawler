@@ -5,6 +5,8 @@
     <title>全网比价--{{ category }}</title>
     {% load bootstrap4 %}
     {% load static %}
+    {% bootstrap_jquery %}
+    {% bootstrap_javascript %}
     {% bootstrap_css %}
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -16,8 +18,17 @@
 <div class="filter_head">
     <div class="filter_head_mid">
         <a href="/"><img src="{% static 'img/logo.png' %}" alt="" width="160px" height="75px"></a>
-        <form method="get" action="{% url 'products_filter' category %}" class="search_head">
+        <form method="get" action="{% url 'products_filter' category %}" class="search_head" id="search_form">
             <div class="input-group">
+                <div class="input-group-prepend">
+                    <select class="custom-select" id="input_select" form="search_form">
+                        <option value="{{ category }}" selected>{{ category }}</option>
+                        <option value="1">One</option>
+                        <option value="2">Two</option>
+                        <option value="3">Three</option>
+                    </select>
+                    <label for="input_select"></label>
+                </div>
                 <input type="text" class="form-control" name="str" placeholder="Search...">
                 <div class="input-group-append">
                     <button class="input-group-text" id="basic-addon2">搜索</button>

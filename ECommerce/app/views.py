@@ -53,7 +53,7 @@ def get_filter_list(model, value):
     return [lst[i:i + 8] for i in range(0, len(lst), 8)]
 
 
-def get_filter_list_sorted(model, value):
+def get_filter_list_data(model, value):
     lst = list(set(list(model.values_list(value))))
     if '' in lst:
         lst.remove('')
@@ -77,6 +77,21 @@ def get_filter_list_sorted(model, value):
     gb.sort(reverse=True)
     lst = [str(x) + 'TB' for x in tb] + [str(x) + 'GB' for x in gb] + [str(x) + 'MB' for x in mb] + etc
 
+    if '其他' in lst:
+        lst.remove('其他')
+        lst.append('其他')
+    if lst:
+        lst += [''] * (8 - len(lst) % 8)
+    return [lst[i:i + 8] for i in range(0, len(lst), 8)]
+
+
+def get_filter_list_sorted(model, value):
+    lst = list(set(list(model.values_list(value))))
+    if '' in lst:
+        lst.remove('')
+    if len(lst) == 1:
+        return []
+    lst.sort(reverse=True)
     if '其他' in lst:
         lst.remove('其他')
         lst.append('其他')
@@ -189,9 +204,9 @@ def cellphone_filter(request):
     if not cpu:
         filter_list.append(('CPU', 'cpu', get_filter_list(products, 'cpu')))
     if not ram:
-        filter_list.append(('RAM', 'ram', get_filter_list_sorted(products, 'ram')))
+        filter_list.append(('RAM', 'ram', get_filter_list_data(products, 'ram')))
     if not rom:
-        filter_list.append(('ROM', 'rom', get_filter_list_sorted(products, 'rom')))
+        filter_list.append(('ROM', 'rom', get_filter_list_data(products, 'rom')))
     if not network_support:
         filter_list.append(('网络支持', 'network_support', get_network_filter_list(products)))
     if not price_range:
@@ -319,13 +334,13 @@ def computer_filter(request, model):
     if not cpu:
         filter_list.append(('CPU', 'cpu', get_filter_list(products, 'cpu')))
     if not core:
-        filter_list.append(('核心数', 'core', get_filter_list(products, 'core')))
+        filter_list.append(('核心数', 'core', get_filter_list_sorted(products, 'core')))
     if not ram:
-        filter_list.append(('内存', 'ram', get_filter_list_sorted(products, 'ram')))
+        filter_list.append(('内存', 'ram', get_filter_list_data(products, 'ram')))
     if not hdd:
-        filter_list.append(('机械硬盘', 'hdd', get_filter_list_sorted(products, 'hdd')))
+        filter_list.append(('机械硬盘', 'hdd', get_filter_list_data(products, 'hdd')))
     if not ssd:
-        filter_list.append(('固态硬盘', 'ssd', get_filter_list_sorted(products, 'ssd')))
+        filter_list.append(('固态硬盘', 'ssd', get_filter_list_data(products, 'ssd')))
     if not graphic_card:
         filter_list.append(('显卡', 'graphic_card', get_filter_list(products, 'graphic_card')))
     if not price_range:

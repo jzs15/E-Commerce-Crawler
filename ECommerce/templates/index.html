@@ -5,6 +5,8 @@
     <title>Title</title>
     {% load bootstrap4 %}
     {% load static %}
+    {% bootstrap_jquery %}
+    {% bootstrap_javascript %}
     {% bootstrap_css %}
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
@@ -12,7 +14,21 @@
 <body>
 <div class="index_search">
     <form method="get" action="{% url 'search' %}">
-        <input type="text" class="form-control" name="str" placeholder="Search..." >
+        <div class="input-group mb-3">
+            <div class="input-group-prepend">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
+                        aria-haspopup="true" aria-expanded="false">Dropdown
+                </button>
+                <div class="dropdown-menu">
+                    <a class="dropdown-item" href="#">Action</a>
+                    <a class="dropdown-item" href="#">Another action</a>
+                    <a class="dropdown-item" href="#">Something else here</a>
+                    <div role="separator" class="dropdown-divider"></div>
+                    <a class="dropdown-item" href="#">Separated link</a>
+                </div>
+            </div>
+            <input type="text" class="form-control" name="str" placeholder="Search...">
+        </div>
     </form>
 </div>
 </body>
