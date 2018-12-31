@@ -204,9 +204,150 @@ def cellphone_filter(request):
     return products, filtered, filter_list
 
 
+def refrigerator_filter(request):
+    products = Refrigerator.objects.all()
+    filtered = []
+    filter_list = []
+    products = get_products_by_search(products, request.GET.get('str'))
+    color = request.GET.get('color')
+    platform = request.GET.get('platform')
+    brand = request.GET.get('brand')
+    weather = request.GET.get('weather')
+    voltFre = request.GET.get('voltFre')
+    rank = request.GET.get('rank')
+    method = request.GET.get('method')
+    price_range = request.GET.get('price_range')
+    if brand:
+        products = products.filter(brand=brand)
+        filtered.append(('品牌', 'brand', brand))
+    if weather:
+        products = products.filter(weather=weather)
+        filtered.append(('气候类型', 'weather', weather))
+    if voltFre:
+        products = products.filter(voltFre=voltFre)
+        filtered.append(('电压/频率', 'voltFre', voltFre))
+    if rank:
+        products = products.filter(rank=rank)
+        filtered.append(('国家能效等级', 'rank', rank))
+    if method:
+        products = products.filter(method=method)
+        filtered.append(('开门方式', 'method', method))
+    if price_range:
+        products = price_range_filter(products, price_range)
+        filtered.append(('价格范围', 'price_range', price_range))
+    if color:
+        products = products.filter(color=color)
+        filtered.append(('机身颜色', 'color', color))
+    if platform:
+        products = products.filter(platform=platform)
+        filtered.append(('商城', 'platform', platform))
+
+    if not brand:
+        filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
+    if not weather:
+        filter_list.append(('气候类型', 'weather', get_filter_list(products, 'weather')))
+    if not voltFre:
+        filter_list.append(('电压/频率', 'voltFre', get_filter_list(products, 'voltFre')))
+    if not rank:
+        filter_list.append(('国家能效等级', 'rank', get_filter_list(products, 'rank')))
+    if not method:
+        filter_list.append(('开门方式', 'method', get_filter_list(products, 'method')))
+    if not price_range:
+        filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
+    if not color:
+        filter_list.append(('机身颜色', 'color', get_filter_list(products, 'color')))
+    if not platform:
+        filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
+
+    return products, filtered, filter_list
+
+
+def computer_filter(request, model):
+    products = model.objects.all()
+    filtered = []
+    filter_list = []
+    products = get_products_by_search(products, request.GET.get('str'))
+    color = request.GET.get('color')
+    platform = request.GET.get('platform')
+    brand = request.GET.get('brand')
+    os = request.GET.get('os')
+    core = request.GET.get('core')
+    cpu = request.GET.get('cpu')
+    ram = request.GET.get('ram')
+    hdd = request.GET.get('hdd')
+    ssd = request.GET.get('ssd')
+    graphic_card = request.GET.get('graphic_card')
+    price_range = request.GET.get('price_range')
+    if brand:
+        products = products.filter(brand=brand)
+        filtered.append(('品牌', 'brand', brand))
+    if os:
+        products = products.filter(os=os)
+        filtered.append(('操作系统', 'os', os))
+    if cpu:
+        products = products.filter(cpu=cpu)
+        filtered.append(('CPU', 'cpu', cpu))
+    if core:
+        products = products.filter(core=core)
+        filtered.append(('核心数', 'core', core))
+    if ram:
+        products = products.filter(ram=ram)
+        filtered.append(('内存', 'ram', ram))
+    if hdd:
+        products = products.filter(hdd=hdd)
+        filtered.append(('机械硬盘', 'hdd', hdd))
+    if ssd:
+        products = products.filter(ssd=ssd)
+        filtered.append(('固态硬盘', 'ssd', ssd))
+    if graphic_card:
+        products = products.filter(graphic_card=graphic_card)
+        filtered.append(('显卡', 'graphic_card', graphic_card))
+    if price_range:
+        products = price_range_filter(products, price_range)
+        filtered.append(('价格范围', 'price_range', price_range))
+    if color:
+        products = products.filter(color=color)
+        filtered.append(('机身颜色', 'color', color))
+    if platform:
+        products = products.filter(platform=platform)
+        filtered.append(('商城', 'platform', platform))
+
+    if not brand:
+        filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
+    if not os:
+        filter_list.append(('操作系统', 'os', get_filter_list(products, 'os')))
+    if not cpu:
+        filter_list.append(('CPU', 'cpu', get_filter_list(products, 'cpu')))
+    if not core:
+        filter_list.append(('核心数', 'core', get_filter_list(products, 'core')))
+    if not ram:
+        filter_list.append(('内存', 'ram', get_filter_list_sorted(products, 'ram')))
+    if not hdd:
+        filter_list.append(('机械硬盘', 'hdd', get_filter_list_sorted(products, 'hdd')))
+    if not ssd:
+        filter_list.append(('固态硬盘', 'ssd', get_filter_list_sorted(products, 'ssd')))
+    if not graphic_card:
+        filter_list.append(('显卡', 'graphic_card', get_filter_list(products, 'graphic_card')))
+    if not price_range:
+        filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
+    if not color:
+        filter_list.append(('机身颜色', 'color', get_filter_list(products, 'color')))
+    if not platform:
+        filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
+
+    return products, filtered, filter_list
+
+
 def get_products_by_category(request, category):
     if category == '手机':
         return cellphone_filter(request)
+    if category == '冰箱':
+        return refrigerator_filter(request)
+    if category == '笔记本':
+        return computer_filter(request, Laptop)
+    if category == '台式电脑':
+        return computer_filter(request, Desktop)
+
     return None, None, None
 
 

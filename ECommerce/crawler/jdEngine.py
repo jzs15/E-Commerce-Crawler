@@ -14,6 +14,20 @@ class JDEngine:
         self.isConnected = False
         self.session = requests.Session()
 
+        self.cellphone_info_list = [('color', '机身颜色'), ('os', '操作系统'), ('cpu', 'CPU品牌'), ('ram', 'RAM'),
+                                    ('rom', 'ROM'), ('frequency', '分辨率'), ('screen_size', '主屏幕尺寸（英寸）')]
+        self.refrigerator_info_list = [('color', '颜色'), ('open_method', '开门方式'), ('weather', '气候类型'),
+                                       ('voltFre', '电压/频率'), ('rank', '能效等级'), ('ability', '冷冻能力(kg/24h)'),
+                                       ('method', '制冷方式'), ('dB', '运转音dB(A)'), ('weight', '产品重量（kg）'),
+                                       ('cold_volume', '冷藏室(升)'), ('ice_volume', '冷冻室(升)'),
+                                       ('form_size', '产品尺寸（深x宽x高）mm'), ('case_size', '包装尺寸（深x宽x高）mm')]
+        self.laptop_info_list = [('color', '颜色'), ('os', '操作系统'), ('core', '核心'),
+                                 ('cpu', 'CPU型号'), ('ram', '内存容量'),
+                                 ('graphic_card', '显示芯片'), ('weight', '净重'),
+                                 ('frequency', '物理分辨率')]
+        self.desktop_info_list = [('color', '颜色'), ('os', '操作系统'), ('core', '核心数'), ('cpu', 'CPU型号'),
+                                  ('graphic_card', '显示芯片'), ('weight', '重量')]
+
     def get_common_info(self, product_id, spider):
         url = "https://item.jd.com/{}.html".format(product_id)
         res = get_request(url, self.session)
@@ -50,8 +64,13 @@ class JDEngine:
         return {**product_info, **evaluation, **other_info}
 
     @staticmethod
-    def get_detail_info(root, val):
-        detail = root.xpath("//dt[text()='{}']/following-sibling::*/text()".format(val))
+    def get_detail_info(root, val, parent=None):
+        if parent is None:
+            detail = root.xpath("//dt[text()='{}']/following-sibling::*/text()".format(val))
+        else:
+            detail = root.xpath(
+                "//h3[text()='{}']/following-sibling::*//dt[text()='{}']/following-sibling::*/text()".format(parent,
+                                                                                                            val))
         return str(detail[-1]) if detail else ''
 
     @staticmethod
@@ -127,20 +146,54 @@ class JDEngine:
         return {'china_mobile': china_mobile, 'china_unicom': china_unicom, 'china_telecom': china_telecom,
                 'all_kind': all_kind}
 
+    def get_disk_info(self, root, val):
+        disk = self.get_detail_info(root, val)
+        if disk:
+            temp = disk.split()
+            for t in temp:
+                if t.replace('GB', '').isnumeric() or t.replace('TB', '').isnumeric():
+                    return t
+        return ''
+
     def cellphone_spider(self, root):
         info = dict()
-        info['color'] = self.get_detail_info(root, '机身颜色')
-        info['os'] = self.get_detail_info(root, '操作系统')
-        info['cpu'] = self.get_detail_info(root, 'CPU品牌')
-        info['ram'] = self.get_detail_info(root, 'RAM')
-        info['rom'] = self.get_detail_info(root, 'ROM')
-        info['frequency'] = self.get_detail_info(root, '分辨率')
-        info['screen_size'] = self.get_detail_info(root, '主屏幕尺寸（英寸）')
+        for name, value in self.cellphone_info_list:
+            info[name] = self.get_detail_info(root, value)
         info['network_support'] = self.get_network_info(root)
         info['weight'] = remove_remark(self.get_detail_info(root, '机身重量（g）'))
         info['thickness'] = remove_remark(self.get_detail_info(root, '机身厚度（mm）'))
         info['height'] = remove_remark(self.get_detail_info(root, '机身长度（mm）'))
         info['width'] = remove_remark(self.get_detail_info(root, '机身宽度（mm）'))
+        return info
+
+    def refrigerator_spider(self, root):
+        info = dict()
+        for name, value in self.refrigerator_info_list:
+            info[name] = self.get_detail_info(root, value)
+        return info
+
+    def laptop_spider(self, root):
+        info = dict()
+        for name, value in self.laptop_info_list:
+            info[name] = self.get_detail_info(root, value)
+        info['hdd'] = self.get_disk_info(root, '硬盘容量')
+        info['ssd'] = self.get_disk_info(root, '固态硬盘')
+        return info
+
+    def desktop_spider(self, root):
+        info = dict()
+        for name, value in self.desktop_info_list:
+            info[name] = self.get_detail_info(root, value)
+        info['ram'] = self.get_detail_info(root, '容量', '内存')
+        rom = self.get_detail_info(root, '容量', '硬盘')
+        rom = rom.split('；')
+        info['hdd'] = ''
+        info['ssd'] = ''
+        for r in rom:
+            if r.find('SSD') != -1:
+                info['hdd'] = r
+            else:
+                info['ssd'] = r.split(' ')[0]
         return info
 
     def crawler(self, cat):
@@ -150,6 +203,15 @@ class JDEngine:
         if cat == '9987,653,655':
             spider = self.cellphone_spider
             model = Cellphone
+        elif cat == '737,794,878':
+            spider = self.refrigerator_spider
+            model = Refrigerator
+        elif cat == '670,671,672':
+            spider = self.laptop_spider
+            model = Laptop
+        elif cat == '670,671,673':
+            spider = self.desktop_spider
+            model = Desktop
         for i in range(n):
             url = "https://list.jd.com/list.html?cat={}&page=".format(cat) + str(i)
             res = get_request(url, self.session)
@@ -201,7 +263,10 @@ def get_request(url, session, times=0):
 def main():
     start_time = time.time()
     jd = JDEngine()
-    jd.crawler('9987,653,655')
+    # jd.crawler('9987,653,655')
+    # jd.crawler('737,794,878')
+    # jd.crawler('670,671,672')
+    jd.crawler('670,671,673')
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
