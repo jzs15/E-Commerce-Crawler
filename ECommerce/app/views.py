@@ -99,7 +99,7 @@ def get_products_by_search(products, search_string):
 
 def price_range_filter(products, price_range):
     range = price_range.split('~')
-    products = products.filter(price__gte=float(range[0]))
+    products = products.filter(price__gt=float(range[0]))
     products = products.filter(price__lte=float(range[1]))
     return products
 
