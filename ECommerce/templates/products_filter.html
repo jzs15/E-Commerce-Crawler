@@ -120,8 +120,8 @@
                         <img src="{{ product.image }}" width="160px" alt="">
                     </td>
                     <td>
-                        <p><a href="{% url 'products_detail' product.id %}">{{ product.model }}</a></p>
-                        <p>{{ product.title }}</p>
+                        <p><a href="{% url 'products_detail' product.id %}">{{ product.model|safe }}</a></p>
+                        <p>{{ product.title|safe }}</p>
                     </td>
                     <td class="price" width="10%">
                         {% if product.price >= 0 %}

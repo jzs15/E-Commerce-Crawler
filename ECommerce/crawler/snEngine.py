@@ -2,6 +2,7 @@ import requests
 import lxml.html
 import time
 from selenium import webdriver
+import json
 from ECommerce.settings import DATABASE_NAME
 from app.models import *
 from mongoengine import *
@@ -87,6 +88,9 @@ class SDEngine:
         m_dict['platform'] = '苏宁'
 
     def save_to_db(self, m_dict, model):
+        with open(model.__name__ + '.json', 'a', encoding='utf-8') as json_file:
+            json_file.write(json.dumps(m_dict) + ',\n')
+        '''
         if not self.is_connect:
             connect(DATABASE_NAME)
             self.is_connect = True
@@ -96,6 +100,7 @@ class SDEngine:
             product.save()
         else:
             products.update(**m_dict)
+        '''
 
     @staticmethod
     def get_common_info(driver, m_dict):
