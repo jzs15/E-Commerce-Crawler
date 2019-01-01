@@ -7,47 +7,58 @@ from ECommerce.settings import DATABASE_NAME
 from mongoengine import *
 import time
 from crawler.util import *
+from selenium import webdriver
+from selenium.common.exceptions import NoSuchElementException
 
 
 class TBEngine:
     def __init__(self):
         self.isConnected = False
         self.session = requests.Session()
+        self.driver = webdriver.Chrome()
+
+    def get_taobao_common(self, spider):
+        product_info = dict()
+        product_info['title'] = self.driver.find_element_by_class_name('tb-main-title').text
+        product_info['shop_name'] = self.driver.find_element_by_class_name('shop-name-title').get_attribute('title')
+        product_info['image'] = self.driver.find_element_by_id('J_ImgBooth').get_attribute('src')
+
+        ps = self.driver.find_element_by_id('attributes').find_elements_by_tag_name('p')
+        for p in ps:
+            text = p.text
+            if '品牌' in text:
+                product_info['brand'] = text.split(':')[-1].strip()
+            elif '型号' in text:
+                product_info['model'] = text.split(':')[-1].strip()
+        self.driver.find_element_by_xpath('//a[@shortcut-label="查看累计评论"]').click()
+        self.driver.implicitly_wait(3)
+        good = int(self.driver.find_element_by_xpath('//san[@data-kg-rate-stats="good"').text[1:-1])
+        neutral = int(self.driver.find_element_by_xpath('//san[@data-kg-rate-stats="neutral"').text[1:-1])
+        bad = int(self.driver.find_element_by_xpath('//san[@data-kg-rate-stats="bad"').text[1:-1])
+        total = good + neutral + bad
+        score = (good * 5 + neutral * 3 + bad) / total if total else 0.0
+        product_info['comment_num'] = total
+        product_info['score'] = score
+        return product_info
+
+    def get_tmall_common(self, spider):
+        return
 
     def get_common_info(self, product_id, spider):
-        url = product_id
-        res = get_request(url, self.session)
-        if res is None:
-            return
-        root = lxml.html.etree.HTML(res.text)
-        product_info = {'platform': '淘宝'}
+        url = 'https://item.taobao.com/item.htm?id={}'.format(product_id)
+        base_info = {'platform': '淘宝', 'url': url}
+        self.driver.get(url)
 
-        shop_name = root.xpath("//div[@class='name']/a/@title|//div[@class='shopName']/strong/span/a/text()")
-        product_info['shop_name'] = str(shop_name[0]) if shop_name else '京东自营'
-
-        image_url = root.xpath('//img[@id="spec-img"]/@data-origin')
-        product_info['image'] = str(image_url[0]) if image_url else ''
-        brand = root.xpath("//ul[@id='parameter-brand']/li/@title")
-        brand = str(brand[0]) if brand else None
-        if not brand:
-            brand = self.get_detail_info(root, "品牌")
-        product_info['brand'] = brand
-
-        model = root.xpath('//ul[@class="parameter2 p-parameter-list"]/li[1]/@title|//'
-                           'ul[@class="parameter2"]/li[1]/@title')
-        model = str(model[0]) if model else ''
-        if not model:
-            model = self.get_detail_info(root, "型号")
-
-        title = root.xpath("//div[@class='sku-name']/text()")
-        product_info['title'] = self.get_title(title) if title else model
-        product_info['model'] = model
-        product_info['date'] = self.get_date(root)
-        product_info['price'] = self.get_price(product_id)
-        product_info['url'] = url
-        evaluation = self.get_evaluation(product_id)
-        other_info = spider(root)
-        return {**product_info, **evaluation, **other_info}
+        product_info = dict()
+        if '淘宝' in self.driver.title:
+            product_info = self.get_taobao_common(spider)
+        else:
+            '''
+            base_info['shop_name'] = self.driver.find_element_by_class_name('shopLink').text
+            product_info = self.get_tmall_common(spider)
+            '''
+            pass
+        return {**base_info, **product_info}
 
     @staticmethod
     def get_detail_info(root, val):
@@ -89,18 +100,10 @@ class TBEngine:
         evaluation['score'] = (good * 5 + general * 3 + poor) / total if total else 0
         return evaluation
 
-    def get_max_page(self, cat):
-        url = "https://s.taobao.com/search?q={}".format(cat)
-        res = get_request(url, self.session)
-        if res is None:
-            return 0
-        res.encoding = 'utf-8'
-        root = lxml.html.etree.HTML(res.text)
-        num = root.xpath('//div[@class="total"]/text()')[0].split()
-        for n in num:
-            if n.isnumeric():
-                return int(n)
-        return int(0)
+    def get_max_page(self):
+        text = self.driver.find_element_by_xpath('//div[@class="total"]').text
+        num = re.findall(re.compile(r'(\d+)'), text)
+        return int(num[0]) if num else 0
 
     def get_date(self, root):
         year = self.get_detail_info(root, '上市年份')
@@ -147,23 +150,41 @@ class TBEngine:
         return info
 
     def crawler(self, cat):
-        n = self.get_max_page(cat)
+        self.driver.get('https://s.taobao.com/search?q={}'.format(cat))
+        n = self.get_max_page()
         spider = None
         model = None
         if cat == '手机':
             spider = self.cellphone_spider
             model = Cellphone
         for i in range(n):
-            url = "https://s.taobao.com/search?q={}&page={}".format(cat, i)
-            res = get_request(url, self.session)
-            if res is None:
-                continue
-            res.encoding = 'utf-8'
-            root = lxml.html.etree.HTML(res.text)
-            ids = root.xpath('//a[@class="product-title"]/@href')
-            for product_id in ids:
-                info = self.get_common_info(product_id, spider)
-                self.save_to_db(info, model)
+            url = "https://s.taobao.com/search?q={}&page={}".format(cat, i+1)
+            self.driver.get(url)
+            elements = self.driver.find_elements_by_xpath('//a[@class="product-title"]')
+            urls = [elem.get_attribute('href') for elem in elements]
+            for url in urls:
+                self.driver.get(url)
+                m = self.get_max_page()
+                for j in range(m):
+                    self.driver.get(url + '&s=' + str(j*44))
+                    root = lxml.html.etree.HTML(self.driver.page_source)
+                    elements = root.xpath('//div[@class="item g-clearfix"]')
+                    ids = []
+                    prices = []
+                    for elem in elements:
+                        id = elem.xpath('.//a[@data-nid]/@data-nid')
+                        price = elem.xpath('.//div[@class="price-row"]//strong/text()')
+                        if id and price:
+                            ids.append(id[0])
+                            prices.append(float(price[0]))
+                    for k in range(len(ids)):
+                        product_id = ids[k]
+                        info = self.get_common_info(product_id, spider)
+                        info['price'] = prices[k]
+                        if 'title' not in info:
+                            continue
+                        self.save_to_db(info, model)
+
 
     def save_to_db(self, info, model):
         if not self.isConnected:
@@ -178,6 +199,10 @@ class TBEngine:
             product.save()
         else:
             products.update(**info)
+
+    def login(self):
+        self.driver.get('https://login.taobao.com')
+        input("Continue?")
 
 
 def get_request(url, session, times=0):
@@ -204,6 +229,7 @@ def get_request(url, session, times=0):
 def main():
     start_time = time.time()
     tb = TBEngine()
+    tb.login()
     tb.crawler('手机')
     print("--- %s seconds ---" % (time.time() - start_time))
 

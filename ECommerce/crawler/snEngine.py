@@ -201,12 +201,8 @@ class SDEngine:
             url = "https://product.suning.com/" + id + ".html"
             info['url'] = url
             driver.get(url)
-            try:
-                self.get_common_info(driver, info)
-                self.detail_info_crawler(driver, info, info_list_en, info_list_cn)
-            except Exception as e:
-                traceback.print_tb(e)
-                continue
+            self.get_common_info(driver, info)
+            self.detail_info_crawler(driver, info, info_list_en, info_list_cn)
             self.save_to_db(info, model)
 
     @staticmethod

@@ -7,6 +7,7 @@ from ECommerce.settings import DATABASE_NAME
 from mongoengine import *
 import time
 from crawler.util import *
+import json
 
 
 class JDEngine:
@@ -85,7 +86,7 @@ class JDEngine:
         req = get_request(url, self.session)
         page = req.text
         price_list = re.findall(re.compile(reg), page)
-        return float(price_list[0])
+        return float(price_list[0]) if price_list else -1.0
 
     def get_evaluation(self, product_id):
         evaluation = {}
