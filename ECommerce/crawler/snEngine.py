@@ -24,6 +24,8 @@ class SDEngine:
         self.desktop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号', '重量']
         self.television_info_list_en = ['brand', 'model', 'tv_category', 'date', 'length', 'frequency', 'light', 'color', 'ratio', 'os', 'ram', 'rom', 'machine_power', 'wait_power', 'volt', 'size', 'weight']
         self.television_info_list_cn = ['品牌', '产品型号', '电视类型', '上市时间', '屏幕尺寸', '屏幕分辨率', '光源类型', '产品颜色', '屏幕比例', '操作系统', 'RAM内存（DDR）', 'ROM存储（EMMC）', '整机功率（W）', '待机功率（W）', '电源电压', '单屏尺寸（宽*高*厚）', '单屏重量（KG）']
+        self.washer_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'drain_method', 'weight', 'wash_volume', 'dewater_volume', 'size', 'rank']
+        self.washer_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '排水方式', '产品重量', '洗衣容量', '脱水容量', '外形尺寸（宽*深*高）', '国家能效等级']
 
     @staticmethod
     def get_page_num(category):
@@ -70,6 +72,9 @@ class SDEngine:
                 m_dict[i] = ''
         elif model == Television:
             for i in self.television_info_list_en:
+                m_dict[i] = ''
+        elif model == Washer:
+            for i in self.washer_info_list_en:
                 m_dict[i] = ''
         m_dict['platform'] = '苏宁'
 
@@ -131,13 +136,25 @@ class SDEngine:
                     m_dict['brand'] = val.get_attribute('innerHTML')
             elif name == '上市时间':
                 date = val.get_attribute('innerHTML')
-                if '月' in date:
+                if '日' in date:
+                    date = date.replace('年', '.').replace('月', '.').replace('日', '')
+                elif '月' in date:
                     date = date.replace('年', '.').replace('月', '')
                 else:
                     date = date.replace('年', '')
-                if '.' in date:
-                    index = date.find('.')
-                    date = date[:index + 1] + '0' + date[index + 1:]
+                if '-' in date:
+                    date = date.replace('-', '.', 3)
+                num = date.count('.')
+                if num == 2:
+                    index = date.index('.', date.index('.')+1)
+                    date = date[:index]
+                    index = date.index('.')
+                    if len(date) - index < 3:
+                        date = date[:index + 1] + '0' + date[index + 1:]
+                elif num == 1:
+                    index = date.index('.')
+                    if len(date) - index < 3:
+                        date = date[:index + 1] + '0' + date[index + 1:]
                 m_dict['date'] = date
             elif name == '4G网络制式':
                 m_dict['network_support'] = self.get_network_info(val.get_attribute('innerHTML'))
@@ -179,6 +196,10 @@ class SDEngine:
             info_list_en = self.television_info_list_en
             info_list_cn = self.television_info_list_cn
             model = Television
+        elif category == '0-244006-':
+            info_list_en = self.washer_info_list_en
+            info_list_cn = self.washer_info_list_cn
+            model = Washer
         else:
             return
         id_list = self.get_id_list(1, category)
@@ -215,11 +236,12 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     sd = SDEngine()
-    sd.crawling('0-20002-')    #cellphone
-    sd.crawling('0-244005-')   #refrigerator
-    sd.crawling('0-258004-')   #laptop
-    sd.crawling('0-258009-')   #desktop
-    sd.crawling('0-293006-')   #television
+    #sd.crawling('0-20002-')    #cellphone
+    #sd.crawling('0-244005-')   #refrigerator
+    #sd.crawling('0-258004-')   #laptop
+    #sd.crawling('0-258009-')   #desktop
+    #sd.crawling('0-293006-')   #television
+    sd.crawling('0-244006-')   #washer
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
 
