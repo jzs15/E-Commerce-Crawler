@@ -225,6 +225,7 @@ def products_filter(request, category):
     common = request.GET.get('common')
     sort_list = {'price': ('价格', request.GET.get('price')), 'score': ('评分', request.GET.get('score')),
                  'date': ('上市时间', request.GET.get('date')), 'comment_num': ('全网评论数', request.GET.get('comment_num'))}
+    search_string = request.GET.get('str')
     url = request.get_full_path()
     sorted_list = []
     products, filtered, filter_list = get_products_by_category(request, category)
@@ -251,6 +252,12 @@ def products_filter(request, category):
         products = paginator.page(1)
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
+
+    model = 'Apple Iphone 6'
+    str = 'iphone'
+    search_string
+    if str in model:
+        model = model[:i] + '<b style={color:red;}>' + str +  '</b>' + model[j:]
 
     return render(request, 'products_filter.html', {'products': products,
                                                     'max_page': paginator.num_pages, 'total_result': total_result,
