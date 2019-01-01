@@ -33,8 +33,16 @@ class SDEngine:
         etree = lxml.html.etree
         root = etree.HTML(res.text)
         return int(root.xpath(
-            '//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[
-                       -1].attrib['pagenum'])
+            '//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[-1].attrib['pagenum'])
+
+    def is_valid(self, m_dict):
+        num = 0
+        for key, value in m_dict.items():
+            if value == '':
+                num += 1
+        if (num / (len(m_dict) - 10)) > 0.3:
+            return False
+        return True
 
     @staticmethod
     def get_id_list(page_num, category):
@@ -202,7 +210,7 @@ class SDEngine:
             model = Washer
         else:
             return
-        id_list = self.get_id_list(1, category)
+        id_list = self.get_id_list(page_num, category)
         info = dict()
         driver = webdriver.Chrome()
         for id in id_list:
@@ -215,7 +223,8 @@ class SDEngine:
                 self.detail_info_crawler(driver, info, info_list_en, info_list_cn)
             except Exception as e:
                 continue
-            self.save_to_db(info, model)
+            if self.is_valid(info):
+                self.save_to_db(info, model)
 
     @staticmethod
     def get_network_info(net):
