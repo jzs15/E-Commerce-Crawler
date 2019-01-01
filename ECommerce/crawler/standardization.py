@@ -46,6 +46,15 @@ def change_etc(data):
     return data
 
 
+def delete_model_name(model, std_list):
+    model_upper = model.upper().strip()
+    for key, value in std_list.items():
+        for v in value:
+            if v in model_upper:
+                model_upper = model_upper.replace(v, '').strip()
+    return model_upper
+
+
 def change_name(data, std_list):
     data = change_etc(data)
     if data == '其他':
@@ -63,6 +72,7 @@ def standardization():
     products = Cellphone.objects.all()
     for product in products:
         product.brand = change_name(product.brand, cellphone_brand_list)
+        product.model = delete_model_name(product.model, cellphone_brand_list)
         product.os = change_name(product.os, os_list)
         product.cpu = change_name(product.cpu, cpu_brand_list)
         product.save()

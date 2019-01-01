@@ -286,10 +286,15 @@ def products_detail(request, product_id):
     detail_list = []
     if type_name == 'Cellphone':
         detail_list = get_cellphone_detail(product)
+        model = Cellphone
+    compare_list = compare_same_model(request, model, product_id)
 
-    return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list})
+    return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list, 'compare_list': compare_list})
 
 
 def compare_same_model(request, model, product_id):
     product = model.objects.filter(id=product_id).first()
-    products = model.objects.filter(model=product.model)
+    products = model.objects.filter(brand=product.brand)
+    products = products.filter(model=product.model)
+    products = products.order_by('platform')
+    return products

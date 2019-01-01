@@ -67,4 +67,75 @@
         </table>
 
     </div>
+    <div class="filter_mid">
+        <table class="table detail_table">
+            {% for product in compare_list %}
+                <tr>
+                    <td>
+                        <img src="{{ product.image }}" width="110px" alt="">
+                    </td>
+                    <td>
+                        <p><a href="{% url 'products_detail' product.id %}">{{ product.model }}</a></p>
+                        <p>{{ product.title }}</p>
+                    </td>
+                    <td class="price" width="10%">
+                        {% if product.price >= 0 %}
+                            <p style="float: right;">¥{{ product.price }}</p>
+                        {% else %}
+                            <p style="float: right;">暂无报价</p>
+                        {% endif %}
+                    </td>
+                    <td width="15%">
+                        <div class="rating">评价：{{ product.comment_num }}人评论</div>
+                        <div class="rating">
+                            <input type="radio" {% if product.score == 5.0 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="five"/><label class="full" for="five"></label>
+                            <input type="radio" {% if product.score >= 4.5 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="four_half"/><label class="half"
+                                                                              for="four_half"></label>
+                            <input type="radio" {% if product.score >= 4.0 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="four"/><label class="full" for="four"></label>
+                            <input type="radio" {% if product.score >= 3.5 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="three_half"/><label class="half"
+                                                                               for="three_half"></label>
+                            <input type="radio" {% if product.score >= 3.0 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="three"/><label class="full" for="three"></label>
+                            <input type="radio" {% if product.score >= 2.5 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="two_half"/><label class="half"
+                                                                             for="two_half"></label>
+                            <input type="radio" {% if product.score >= 2.0 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="two"/><label class="full" for="two"></label>
+                            <input type="radio" {% if product.score >= 1.5 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="one_half"/><label class="half"
+                                                                             for="one_half"></label>
+                            <input type="radio" {% if product.score >= 1.0 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="one"/><label class="full" for="one"></label>
+                            <input type="radio" {% if product.score >= 0.5 %} checked="checked" {% endif %}
+                                   disabled="disabled" id="zero_half"/><label class="half"
+                                                                              for="zero_half"></label>
+                        </div>
+                        <div class="rating">
+                            {{ product.score|floatformat:-2 }}分
+                        </div>
+                    </td>
+                    <td width="20%" colspan="2">
+                        {% if product.platform == '京东' %}
+                            <p align="right"><img src="{% static 'img/jd.ico' %}" alt="" width="15px">京东商城</p>
+                        {% elif product.platform == '苏宁' %}
+                            <p align="right"><img src="{% static 'img/sn.ico' %}" alt="" width="15px">苏宁易购</p>
+                        {% elif product.platform == '淘宝' %}
+                            <p align="right"><img src="{% static 'img/tb.ico' %}" alt="" width="15px">淘宝</p>
+                        {% elif product.platform == '亚马逊' %}
+                            <p align="right"><img src="{% static 'img/az.ico' %}" alt="" width="15px">中国亚马逊</p>
+                        {% endif %}
+                        <p align="right">{{ product.shop_name }}</p>
+                    </td>
+                </tr>
+                <tr>
+
+                </tr>
+            {% endfor %}
+        </table>
+    </div>
+
 {% endblock %}
