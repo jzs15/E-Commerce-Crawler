@@ -1,3 +1,4 @@
 .idea/
 venv/
 ECommerce/db.sqlite3
+json_data/

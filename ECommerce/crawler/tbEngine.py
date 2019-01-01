@@ -16,6 +16,8 @@ class TBEngine:
         self.isConnected = False
         self.session = requests.Session()
         self.driver = webdriver.Chrome()
+        self.cellphone_info_list = [('color', '颜色'), ('os', '操作系统'), ('cpu', 'CPU品牌'), ('model', '型号'),
+                                    ('frequency', '分辨率'), ('screen_size', '屏幕尺寸')]
 
     def get_taobao_common(self, spider):
         product_info = dict()
@@ -30,16 +32,18 @@ class TBEngine:
                 product_info['brand'] = text.split(':')[-1].strip()
             elif '型号' in text:
                 product_info['model'] = text.split(':')[-1].strip()
+        self.driver.execute_script("window.scrollTo(0, 800);")
+        other_info = spider()
+        time.sleep(2)
         self.driver.find_element_by_xpath('//a[@shortcut-label="查看累计评论"]').click()
-        self.driver.implicitly_wait(3)
-        good = int(self.driver.find_element_by_xpath('//san[@data-kg-rate-stats="good"').text[1:-1])
-        neutral = int(self.driver.find_element_by_xpath('//san[@data-kg-rate-stats="neutral"').text[1:-1])
-        bad = int(self.driver.find_element_by_xpath('//san[@data-kg-rate-stats="bad"').text[1:-1])
+        good = int(self.driver.find_element_by_xpath('//span[@data-kg-rate-stats="good"]').text[1:-1])
+        neutral = int(self.driver.find_element_by_xpath('//span[@data-kg-rate-stats="neutral"]').text[1:-1])
+        bad = int(self.driver.find_element_by_xpath('//span[@data-kg-rate-stats="bad"]').text[1:-1])
         total = good + neutral + bad
         score = (good * 5 + neutral * 3 + bad) / total if total else 0.0
         product_info['comment_num'] = total
         product_info['score'] = score
-        return product_info
+        return {**product_info, **other_info}
 
     def get_tmall_common(self, spider):
         return
@@ -51,19 +55,17 @@ class TBEngine:
 
         product_info = dict()
         if '淘宝' in self.driver.title:
-            product_info = self.get_taobao_common(spider)
+            try:
+                product_info = self.get_taobao_common(spider)
+            except NoSuchElementException:
+                return None
         else:
-            '''
-            base_info['shop_name'] = self.driver.find_element_by_class_name('shopLink').text
-            product_info = self.get_tmall_common(spider)
-            '''
-            pass
+            return None
         return {**base_info, **product_info}
 
     @staticmethod
     def get_detail_info(root, val):
-        detail = root.xpath("//dt[text()='{}']/following-sibling::*/text()".format(val))
-        return str(detail[-1]) if detail else ''
+        return root.find_element_by_xpath(".//th[text()='{}']/following-sibling::td".format(val)).text
 
     @staticmethod
     def get_title(title):
@@ -118,8 +120,7 @@ class TBEngine:
                     date += '.{:02d}'.format(int(month))
         return date
 
-    def get_network_info(self, root):
-        net = self.get_detail_info(root, '4G网络')
+    def get_network_info(self, net):
         if net:
             china_mobile = net.find("移动") >= 0
             china_unicom = net.find("联通") >= 0
@@ -133,20 +134,41 @@ class TBEngine:
         return {'china_mobile': china_mobile, 'china_unicom': china_unicom, 'china_telecom': china_telecom,
                 'all_kind': all_kind}
 
-    def cellphone_spider(self, root):
+    def cellphone_spider(self):
         info = dict()
-        info['color'] = self.get_detail_info(root, '机身颜色')
-        info['os'] = self.get_detail_info(root, '操作系统')
-        info['cpu'] = self.get_detail_info(root, 'CPU品牌')
-        info['ram'] = self.get_detail_info(root, 'RAM')
-        info['rom'] = self.get_detail_info(root, 'ROM')
-        info['frequency'] = self.get_detail_info(root, '分辨率')
-        info['screen_size'] = self.get_detail_info(root, '主屏幕尺寸（英寸）')
-        info['network_support'] = self.get_network_info(root)
-        info['weight'] = remove_remark(self.get_detail_info(root, '机身重量（g）'))
-        info['thickness'] = remove_remark(self.get_detail_info(root, '机身厚度（mm）'))
-        info['height'] = remove_remark(self.get_detail_info(root, '机身长度（mm）'))
-        info['width'] = remove_remark(self.get_detail_info(root, '机身宽度（mm）'))
+        self.driver.find_element_by_class_name("tb-attributes-more").click()
+        root = self.driver.find_element_by_class_name("tb-spu-view")
+        names = root.find_elements_by_xpath(".//th")
+        for name in names:
+            text = name.text
+            if '内存' in text:
+                val = name.find_element_by_xpath("./following-sibling::td").text
+                data_list = ['G', 'T']
+                for i in range(len(data_list)):
+                    data = re.compile('\W*(\d*)' + data_list[i]).findall(val)
+                    if data:
+                        info['ram'] = data[-1] + 'GB' if i == 0 else data[-1] + 'TB'
+                        break
+                continue
+            elif '存储容量' in text:
+                val = name.find_element_by_xpath("./following-sibling::td").text
+                data_list = ['G', 'T']
+                for i in range(len(data_list)):
+                    data = re.compile('\W*(\d*)' + data_list[i]).findall(val)
+                    if data:
+                        info['rom'] = data[-1] + 'GB' if i == 0 else data[-1] + 'TB'
+                        break
+                continue
+            elif '网络类型' in text:
+                val = name.find_element_by_xpath("./following-sibling::td").text
+                info['network_support'] = self.get_network_info(val)
+                continue
+            for name_text, value_text in self.cellphone_info_list:
+                if value_text in text:
+                    info[name_text] = name.find_element_by_xpath("./following-sibling::td").text
+                    break
+
+        self.driver.find_element_by_class_name('tb-spu-close').click()
         return info
 
     def crawler(self, cat):
@@ -167,6 +189,9 @@ class TBEngine:
                 m = self.get_max_page()
                 for j in range(m):
                     self.driver.get(url + '&s=' + str(j*44))
+                    for k in range(1, 10):
+                        self.driver.execute_script("window.scrollTo(0, " + str(k * 1000) + ");")
+                        time.sleep(0.5)
                     root = lxml.html.etree.HTML(self.driver.page_source)
                     elements = root.xpath('//div[@class="item g-clearfix"]')
                     ids = []
@@ -180,17 +205,16 @@ class TBEngine:
                     for k in range(len(ids)):
                         product_id = ids[k]
                         info = self.get_common_info(product_id, spider)
-                        info['price'] = prices[k]
-                        if 'title' not in info:
+                        if info is None:
                             continue
+                        info['price'] = prices[k]
                         self.save_to_db(info, model)
-
 
     def save_to_db(self, info, model):
         if not self.isConnected:
             connect(DATABASE_NAME)
             self.isConnected = True
-        if not info['title']:
+        if 'title' not in info:
             return
 
         products = model.objects.filter(url=info['url'])
