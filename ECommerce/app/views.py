@@ -226,7 +226,6 @@ def products_filter(request, category):
     sort_list = {'price': ('价格', request.GET.get('price')), 'score': ('评分', request.GET.get('score')),
                  'date': ('上市时间', request.GET.get('date')), 'comment_num': ('全网评论数', request.GET.get('comment_num'))}
     search_string = request.GET.get('str')
-    search_string = search_string.upper()
     url = request.get_full_path()
     sorted_list = []
     products, filtered, filter_list = get_products_by_category(request, category)
@@ -255,21 +254,23 @@ def products_filter(request, category):
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
 
-    m_products = products
-    for product in m_products:
-        l = len(search_string)
-        if search_string in product.model.upper():
-            model = product.model
-            model_upper = model.upper()
-            model_index = model_upper.index(search_string)
-            product.model = model[:model_index] + '<em style="color: #c00;">' + model[model_index:model_index+l] + '</em>' + model[model_index+l:]
-        if search_string in product.title.upper():
-            title = product.title
-            title_upper = title.upper()
-            title_index = title_upper.index(search_string)
-            product.title = title[:title_index] + '<em style="color: #c00;">' + title[title_index:title_index + l] + '</em>' + title[title_index + l:]
+    if search_string:
+        search_string = search_string.upper()
+        for product in products:
+            l = len(search_string)
+            if search_string in product.model.upper():
+                model = product.model
+                model_upper = model.upper()
+                model_index = model_upper.index(search_string)
+                product.model = model[:model_index] + '<em style="color: #c00;">' + model[model_index:model_index + l] + '</em>' + model[model_index + l:]
+            if search_string in product.title.upper():
+                title = product.title
+                title_upper = title.upper()
+                title_index = title_upper.index(search_string)
+                product.title = title[:title_index] + '<em style="color: #c00;">' + title[title_index:title_index + l] + '</em>' + title[title_index + l:]
 
-    return render(request, 'products_filter.html', {'products': m_products,
+
+    return render(request, 'products_filter.html', {'products': products,
                                                     'max_page': paginator.num_pages, 'total_result': total_result,
                                                     'category': category, 'filter_list': filter_list,
                                                     'filtered': filtered if filtered else None,
