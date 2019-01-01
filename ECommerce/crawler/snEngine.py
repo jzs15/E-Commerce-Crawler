@@ -14,28 +14,16 @@ class SDEngine:
     def __init__(self):
         self.is_connect = False
         self.common_info_list = ['image', 'title', 'shop_name', 'url', 'price', 'comment_num', 'score']
-        self.cellphone_info_list_en = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width',
-                                       'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
-        self.cellphone_info_list_cn = ['品牌', '型号', '上市时间', '手机操作系统', 'CPU品牌', '运行内存', '机身内存', '机身长度', '机身宽度', '机身厚度',
-                                       '重量', '屏幕尺寸', '屏幕分辨率', '颜色', '4G网络制式']
-        self.refrigerator_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'weather', 'VoltFre',
-                                          'rank', 'ability', 'method', 'dB', 'weight', 'cold_volume', 'ice_volume',
-                                          'form_size', 'case_size']
-        self.refrigerator_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '气候类型', '电压/频率', '国家能效等级', '冷冻能力', '制冷方式',
-                                          '运转音dB(A)', '产品重量', '冷藏室容积', '冷冻室容积', '外形尺寸（宽*深*高）', '包装尺寸（宽*深*高）']
-        self.laptop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd',
-                                    'graphic_card', 'weight', 'frequency']
-        self.laptop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号',
-                                    '重量', '屏幕分辨率']
-        self.desktop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd',
-                                     'graphic_card', 'weight']
+        self.cellphone_info_list_en = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
+        self.cellphone_info_list_cn = ['品牌', '型号', '上市时间', '手机操作系统', 'CPU品牌', '运行内存', '机身内存', '机身长度', '机身宽度', '机身厚度', '重量', '屏幕尺寸', '屏幕分辨率', '颜色', '4G网络制式']
+        self.refrigerator_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'weather', 'VoltFre', 'rank', 'ability', 'method', 'dB', 'weight', 'cold_volume', 'ice_volume', 'form_size', 'case_size']
+        self.refrigerator_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '气候类型', '电压/频率', '国家能效等级', '冷冻能力', '制冷方式', '运转音dB(A)', '产品重量', '冷藏室容积', '冷冻室容积', '外形尺寸（宽*深*高）', '包装尺寸（宽*深*高）']
+        self.laptop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd', 'graphic_card', 'weight', 'frequency']
+        self.laptop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号', '重量', '屏幕分辨率']
+        self.desktop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd', 'graphic_card', 'weight']
         self.desktop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号', '重量']
-        self.television_info_list_en = ['brand', 'model', 'tv_category', 'date', 'length', 'frequency', 'light',
-                                        'color', 'ratio', 'os', 'ram', 'rom', 'machine_power', 'wait_power', 'volt',
-                                        'size', 'weight']
-        self.television_info_list_cn = ['品牌', '产品型号', '电视类型', '上市时间', '屏幕尺寸', '屏幕分辨率', '光源类型', '产品颜色', '屏幕比例', '操作系统',
-                                        'RAM内存（DDR）', 'ROM存储（EMMC）', '整机功率（W）', '待机功率（W）', '电源电压', '单屏尺寸（宽*高*厚）',
-                                        '单屏重量（KG）']
+        self.television_info_list_en = ['brand', 'model', 'tv_category', 'date', 'length', 'frequency', 'light', 'color', 'ratio', 'os', 'ram', 'rom', 'machine_power', 'wait_power', 'volt', 'size', 'weight']
+        self.television_info_list_cn = ['品牌', '产品型号', '电视类型', '上市时间', '屏幕尺寸', '屏幕分辨率', '光源类型', '产品颜色', '屏幕比例', '操作系统', 'RAM内存（DDR）', 'ROM存储（EMMC）', '整机功率（W）', '待机功率（W）', '电源电压', '单屏尺寸（宽*高*厚）', '单屏重量（KG）']
 
     @staticmethod
     def get_page_num(category):
@@ -193,7 +181,7 @@ class SDEngine:
             model = Television
         else:
             return
-        id_list = self.get_id_list(page_num, category)
+        id_list = self.get_id_list(1, category)
         info = dict()
         driver = webdriver.Chrome()
         for id in id_list:
@@ -205,7 +193,6 @@ class SDEngine:
                 self.get_common_info(driver, info)
                 self.detail_info_crawler(driver, info, info_list_en, info_list_cn)
             except Exception as e:
-                traceback.print_tb(e)
                 continue
             self.save_to_db(info, model)
 

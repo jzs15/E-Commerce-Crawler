@@ -214,6 +214,10 @@ def category_list_page(request):
     return render(request, 'categories.html')
 
 
+def takeFirst(elem):
+    return elem[0]
+
+
 def products_filter(request, category):
     if not category:
         return category_list_page(request)
@@ -221,6 +225,7 @@ def products_filter(request, category):
     common = request.GET.get('common')
     sort_list = {'price': ('价格', request.GET.get('price')), 'score': ('评分', request.GET.get('score')),
                  'date': ('上市时间', request.GET.get('date')), 'comment_num': ('全网评论数', request.GET.get('comment_num'))}
+    url = request.get_full_path()
     sorted_list = []
     products, filtered, filter_list = get_products_by_category(request, category)
     if products is None:
@@ -231,9 +236,11 @@ def products_filter(request, category):
             if value[1] is None:
                 continue
             elif value[1] == 'up':
-                sorted_list.append(name)
+                sorted_list.append((url.index(name), name))
             else:
-                sorted_list.append('-' + name)
+                sorted_list.append((url.index(name), '-' + name))
+        sorted_list.sort(key=takeFirst)
+        sorted_list = [i[1] for i in sorted_list]
         products = products.order_by(*sorted_list)
 
     total_result = len(products)
