@@ -2,3 +2,4 @@
 venv/
 ECommerce/db.sqlite3
 json_data/
+ECommerce/debug.log
