@@ -138,6 +138,8 @@ def get_price_range_filter_list(products):
     filter_list = []
     for i in range(int(max_price / 1000) + 1):
         filter_list.append(str(i * 1000) + '~' + str((i + 1) * 1000))
+    if filter_list:
+        filter_list += [''] * (8 - len(filter_list) % 8)
     return [filter_list[i:i + 8] for i in range(0, len(filter_list), 8)]
 
 

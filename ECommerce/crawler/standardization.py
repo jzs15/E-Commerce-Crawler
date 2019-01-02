@@ -118,7 +118,7 @@ def standardization():
     products = Refrigerator.objects.all()
     for product in products:
         product.brand = change_brand(product.brand)
-        product.rank = product.rank.replace(' ', '', 3)
+        product.rank = product.rank.replace(' ', '', product.count(' '))
         product.weather = change_weather(product.weather)
         product.save()
 
