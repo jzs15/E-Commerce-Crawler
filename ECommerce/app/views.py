@@ -23,7 +23,6 @@ def search(request):
     for word in words:
         q_object &= (Q(title__icontains=word) | Q(model__icontains=word))
     items = Product.objects.filter(q_object)
-    print(len(items))
     paginator = Paginator(items, 60)
     try:
         products = paginator.page(page)
@@ -355,6 +354,130 @@ def computer_filter(request, model):
     return products, filtered, filter_list
 
 
+def television_filter(request):
+    products = Television.objects.all()
+    filtered = []
+    filter_list = []
+    products = get_products_by_search(products, request.GET.get('str'))
+    color = request.GET.get('color')
+    platform = request.GET.get('platform')
+    brand = request.GET.get('brand')
+    tv_category = request.GET.get('tv_category')
+    os = request.GET.get('os')
+    ram = request.GET.get('ram')
+    rom = request.GET.get('rom')
+    price_range = request.GET.get('price_range')
+
+    if brand:
+        products = products.filter(brand=brand)
+        filtered.append(('品牌', 'brand', brand))
+    if tv_category:
+        products = products.filter(tv_category=tv_category)
+        filtered.append(('电视类型', 'tv_category', tv_category))
+    if os:
+        products = products.filter(os=os)
+        filtered.append(('操作系统', 'os', os))
+    if ram:
+        products = products.filter(ram=ram)
+        filtered.append(('RAM', 'ram', ram))
+    if rom:
+        products = products.filter(rom=rom)
+        filtered.append(('ROM', 'rom', rom))
+    if price_range:
+        products = price_range_filter(products, price_range)
+        filtered.append(('价格范围', 'price_range', price_range))
+    if color:
+        products = products.filter(color=color)
+        filtered.append(('颜色', 'color', color))
+    if platform:
+        products = products.filter(platform=platform)
+        filtered.append(('商城', 'platform', platform))
+
+    if not brand:
+        filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
+    if not tv_category:
+        filter_list.append(('电视类型', 'tv_category', get_filter_list(products, 'tv_category')))
+    if not os:
+        filter_list.append(('操作系统', 'os', get_filter_list(products, 'os')))
+    if not ram:
+        filter_list.append(('RAM', 'ram', get_filter_list(products, 'ram')))
+    if not rom:
+        filter_list.append(('ROM', 'rom', get_filter_list(products, 'rom')))
+    if not price_range:
+        filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
+    if not color:
+        filter_list.append(('颜色', 'color', get_filter_list(products, 'color')))
+    if not platform:
+        filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
+
+    return products, filtered, filter_list
+
+
+def washer_filter(request):
+    products = Television.objects.all()
+    filtered = []
+    filter_list = []
+    products = get_products_by_search(products, request.GET.get('str'))
+    color = request.GET.get('color')
+    platform = request.GET.get('platform')
+    brand = request.GET.get('brand')
+    open_method = request.GET.get('open_method')
+    drain_method = request.GET.get('drain_method')
+    wash_volume = request.GET.get('wash_volume')
+    dewater_volume = request.GET.get('dewater_volume')
+    rank = request.GET.get('rank')
+    price_range = request.GET.get('price_range')
+
+    if brand:
+        products = products.filter(brand=brand)
+        filtered.append(('品牌', 'brand', brand))
+    if open_method:
+        products = products.filter(open_method=open_method)
+        filtered.append(('开门方式', 'open_method', open_method))
+    if drain_method:
+        products = products.filter(drain_method=drain_method)
+        filtered.append(('排水方式', 'drain_method', drain_method))
+    if wash_volume:
+        products = products.filter(wash_volume=wash_volume)
+        filtered.append(('洗衣容量', 'wash_volume', wash_volume))
+    if dewater_volume:
+        products = products.filter(dewater_volume=dewater_volume)
+        filtered.append(('脱水容量', 'dewater_volume', dewater_volume))
+    if rank:
+        products = products.filter(rank=rank)
+        filtered.append(('国家能效等级', 'rank', rank))
+    if price_range:
+        products = price_range_filter(products, price_range)
+        filtered.append(('价格范围', 'price_range', price_range))
+    if color:
+        products = products.filter(color=color)
+        filtered.append(('颜色', 'color', color))
+    if platform:
+        products = products.filter(platform=platform)
+        filtered.append(('商城', 'platform', platform))
+
+    if not brand:
+        filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
+    if not open_method:
+        filter_list.append(('开门方式', 'open_method', get_filter_list(products, 'open_method')))
+    if not drain_method:
+        filter_list.append(('排水方式', 'drain_method', get_filter_list(products, 'drain_method')))
+    if not wash_volume:
+        filter_list.append(('洗衣容量', 'wash_volume', get_filter_list(products, 'wash_volume')))
+    if not dewater_volume:
+        filter_list.append(('脱水容量', 'dewater_volume', get_filter_list(products, 'dewater_volume')))
+    if not rank:
+        filter_list.append(('国家能效等级', 'rank', get_filter_list(products, 'rank')))
+    if not price_range:
+        filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
+    if not color:
+        filter_list.append(('颜色', 'color', get_filter_list(products, 'color')))
+    if not platform:
+        filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
+
+    return products, filtered, filter_list
+
+
 def get_products_by_category(request, category):
     if category == '手机':
         return cellphone_filter(request)
@@ -364,7 +487,10 @@ def get_products_by_category(request, category):
         return computer_filter(request, Laptop)
     if category == '台式电脑':
         return computer_filter(request, Desktop)
-
+    if category == '电视':
+        return television_filter(request)
+    if category == '洗衣机':
+        return washer_filter(request)
     return None, None, None
 
 
@@ -471,6 +597,54 @@ def get_cellphone_detail(product):
     ]
 
 
+def get_refrigerator_detail(product):
+    return [
+        [('品牌', product.brand), ('上市时间', product.date), ('颜色', product.color)],
+        [('开门方式', product.open_method), ('气候类型', product.weather), ('电压/频率', product.VoltFre)],
+        [('国家能效等级', product.rank), ('冷冻能力', product.ability), ('制冷方式', product.method)],
+        [('运转音dB(A)', product.dB), ('产品重量', product.weight), ('冷藏室容积', product.cold_volume)],
+        [('冷冻室容积', product.ice_volume), ('外形尺寸（宽*深*高）', product.form_size), ('包装尺寸（宽*深*高）', product.case_size)],
+    ]
+
+
+def get_laptop_detail(product):
+    return [
+        [('品牌', product.brand), ('上市时间', product.date), ('颜色', product.color)],
+        [('操作系统', product.os), ('核心数', product.core), ('CPU型号', product.cpu)],
+        [('内存容量', product.ram), ('硬盘类型', product.ssd), ('硬盘容量', product.hdd)],
+        [('显卡型号', product.graphic_card), ('重量', product.weight), ('屏幕分辨率', product.frequency)],
+    ]
+
+
+def get_desktop_detail(product):
+    return [
+        [('品牌', product.brand), ('上市时间', product.date), ('颜色', product.color)],
+        [('操作系统', product.os), ('核心数', product.core), ('CPU型号', product.cpu)],
+        [('内存容量', product.ram), ('硬盘类型', product.ssd), ('硬盘容量', product.hdd)],
+        [('显卡型号', product.graphic_card), ('重量', product.weight)],
+    ]
+
+
+def get_television_detail(product):
+    return [
+        [('品牌', product.brand), ('上市时间', product.date), ('电视类型', product.tv_category)],
+        [('屏幕尺寸', product.length), ('屏幕分辨率', product.frequency), ('光源类型', product.light)],
+        [('产品颜色', product.color), ('屏幕比例', product.ratio), ('操作系统', product.os)],
+        [('RAM内存（DDR）', product.ram), ('ROM存储（EMMC）', product.rom), ('整机功率（W）', product.machine_power)],
+        [('待机功率（W）', product.wait_power), ('电源电压', product.volt), ('单屏尺寸（宽*高*厚）', product.size),],
+        [('单屏重量（KG）', product.weight),],
+    ]
+
+
+def get_washer_detail(product):
+    return [
+        [('品牌', product.brand), ('上市时间', product.date), ('颜色', product.color)],
+        [('开门方式', product.open_method), ('排水方式', product.drain_method), ('产品重量', product.weight)],
+        [('洗衣容量', product.wash_volume), ('脱水容量', product.dewater_volume)],
+        [('外形尺寸（宽*深*高）', product.size), ('国家能效等级', product.rank)],
+    ]
+
+
 def products_detail(request, product_id):
     product = Product.objects.filter(id=product_id).first()
     type_name = type(product).__name__
@@ -478,6 +652,21 @@ def products_detail(request, product_id):
     if type_name == 'Cellphone':
         detail_list = get_cellphone_detail(product)
         model = Cellphone
+    if type_name == 'Refrigerator':
+        detail_list = get_refrigerator_detail(product)
+        model = Refrigerator
+    if type_name == 'Laptop':
+        detail_list = get_laptop_detail(product)
+        model = Laptop
+    if type_name == 'Desktop':
+        detail_list = get_desktop_detail(product)
+        model = Desktop
+    if type_name == 'Television':
+        detail_list = get_television_detail(product)
+        model = Television
+    if type_name == 'Washer':
+        detail_list = get_washer_detail(product)
+        model = Washer
     compare_list = compare_same_model(request, model, product_id)
 
     return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list, 'compare_list': compare_list})
