@@ -100,3 +100,7 @@ function searchChange(num, col) {
     }
     return false;
 }
+
+function change_select(val) {
+    document.getElementById("search_form").setAttribute("action", '/products_filter/' + val)
+}

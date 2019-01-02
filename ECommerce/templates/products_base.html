@@ -21,15 +21,20 @@
         <form method="get" action="{% url 'products_filter' category %}" class="search_head" id="search_form">
             <div class="input-group">
                 <div class="input-group-prepend">
-                    <select class="custom-select" id="input_select" form="search_form">
-                        <option value="{{ category }}" selected>{{ category }}</option>
-                        <option value="1">One</option>
-                        <option value="2">Two</option>
-                        <option value="3">Three</option>
+                    <select class="custom-select" id="input_select"
+                            onchange="change_select(this.value)">
+                        <option value="全部" {% if category is None %} selected {% endif %}>全部</option>
+                        <option value="手机" {% if category == "手机" %} selected {% endif %}>手机</option>
+                        <option value="笔记本" {% if category == "笔记本" %} selected {% endif %}>笔记本</option>
+                        <option value="台式电脑" {% if category == "台式电脑" %} selected {% endif %}>台式电脑</option>
+                        <option value="洗衣机" {% if category == "洗衣机" %} selected {% endif %}>洗衣机</option>
+                        <option value="冰箱" {% if category == "冰箱" %} selected {% endif %}>冰箱</option>
+                        <option value="电视机" {% if category == "电视机" %} selected {% endif %}>电视机</option>
                     </select>
                     <label for="input_select"></label>
                 </div>
-                <input type="text" class="form-control" name="str" placeholder="Search...">
+                <input type="text" class="form-control" name="str" placeholder="Search..."
+                       {% if search_string %}value="{{ search_string }}"{% endif %}>
                 <div class="input-group-append">
                     <button class="input-group-text" id="basic-addon2">搜索</button>
                 </div>

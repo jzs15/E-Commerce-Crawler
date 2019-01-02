@@ -2,34 +2,72 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>全网比价</title>
     {% load bootstrap4 %}
     {% load static %}
-    {% bootstrap_jquery %}
-    {% bootstrap_javascript %}
     {% bootstrap_css %}
     <link rel="shortcut icon" href="{% static 'img/favicon.ico' %}">
     <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'iconfont/iconfont.css' %}">
+    <script type="text/javascript" src="{% static 'js/products_filter.js' %}">
+    </script>
 </head>
-<body>
-<div class="index_search">
-    <form method="get" action="{% url 'search' %}">
-        <div class="input-group mb-3">
-            <div class="input-group-prepend">
-                <button class="btn btn-outline-secondary dropdown-toggle" type="button" data-toggle="dropdown"
-                        aria-haspopup="true" aria-expanded="false">Dropdown
-                </button>
-                <div class="dropdown-menu">
-                    <a class="dropdown-item" href="#">Action</a>
-                    <a class="dropdown-item" href="#">Another action</a>
-                    <a class="dropdown-item" href="#">Something else here</a>
-                    <div role="separator" class="dropdown-divider"></div>
-                    <a class="dropdown-item" href="#">Separated link</a>
+<body class="gray_body">
+<div class="filter_head">
+    <div class="filter_head_mid">
+        <a href="/"><img src="{% static 'img/logo.png' %}" alt="" width="160px" height="75px"></a>
+        <form method="get" action="{% url 'products_filter' '全部' %}" class="search_head" id="search_form">
+            <div class="input-group">
+                <div class="input-group-prepend">
+                    <select class="custom-select" id="input_select"
+                            onchange="change_select(this.value)">
+                        <option value="全部" selected>全部</option>
+                        <option value="手机">手机</option>
+                        <option value="笔记本">笔记本</option>
+                        <option value="台式电脑">台式电脑</option>
+                        <option value="洗衣机">洗衣机</option>
+                        <option value="冰箱">冰箱</option>
+                        <option value="电视机">电视机</option>
+                    </select>
+                    <label for="input_select"></label>
+                </div>
+                <input type="text" class="form-control" name="str" placeholder="Search...">
+                <div class="input-group-append">
+                    <button class="input-group-text" id="basic-addon2">搜索</button>
                 </div>
             </div>
-            <input type="text" class="form-control" name="str" placeholder="Search...">
-        </div>
-    </form>
+        </form>
+    </div>
+</div>
+<div class="filter_mid">
+    <table class="table category_table">
+        <tr>
+            <td width="25%">
+                <a class="icon iconfont icon-shouji" href="{% url 'products_filter' '手机' %}">手机</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-bijiben" href="{% url 'products_filter' '笔记本' %}">笔记本</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-taishidiannao" href="{% url 'products_filter' '台式电脑' %}">台式电脑</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-xiyiji" href="{% url 'products_filter' '洗衣机' %}">洗衣机</a>
+            </td>
+        </tr>
+        <tr>
+            <td width="25%">
+                <a class="icon iconfont icon-bingxiang" href="{% url 'products_filter' '冰箱' %}">冰箱</a>
+            </td>
+            <td width="25%">
+                <a class="icon iconfont icon-dianshiji" href="{% url 'products_filter' '电视机' %}">电视机</a>
+            </td>
+            <td width="25%">
+            </td>
+            <td width="25%">
+            </td>
+        </tr>
+    </table>
 </div>
 </body>
 </html>

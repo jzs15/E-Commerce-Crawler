@@ -14,28 +14,6 @@ def page_not_found(request):
     return render_to_response('404.html')
 
 
-def search(request):
-    page = request.GET.get('page')
-    search_string = request.GET.get('str')
-    thu = thulac.thulac(seg_only=True)
-    words = thu.cut(search_string, text=True).split()
-    q_object = Q()
-    for word in words:
-        q_object &= (Q(title__icontains=word) | Q(model__icontains=word))
-    items = Product.objects.filter(q_object)
-    print(len(items))
-    paginator = Paginator(items, 60)
-    try:
-        products = paginator.page(page)
-    except PageNotAnInteger:
-        products = paginator.page(1)
-    except EmptyPage:
-        products = paginator.page(paginator.num_pages)
-
-    return render(request, 'search.html', {'products': products, 'search_string': search_string,
-                                           'max_page': paginator.num_pages})
-
-
 def get_filter_list(model, value):
     lst = list(model.values_list(value))
     counts = collections.Counter(lst)
@@ -155,6 +133,28 @@ def get_network_filter_list(products):
         return []
     filter_list += [''] * (8 - len(filter_list) % 8)
     return [filter_list]
+
+
+def product_filter(request):
+    products = Product.objects.all()
+    products = get_products_by_search(products, request.GET.get('str'))
+    platform = request.GET.get('platform')
+    price_range = request.GET.get('price_range')
+    filtered = []
+    filter_list = []
+
+    if price_range:
+        products = price_range_filter(products, price_range)
+        filtered.append(('价格范围', 'price_range', price_range))
+    if platform:
+        products = products.filter(platform=platform)
+        filtered.append(('商城', 'platform', platform))
+
+    if not price_range:
+        filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
+    if not platform:
+        filter_list.append(('商城', 'platform', get_filter_list(products, 'platform')))
+    return products, filtered, filter_list
 
 
 def cellphone_filter(request):
@@ -356,6 +356,8 @@ def computer_filter(request, model):
 
 
 def get_products_by_category(request, category):
+    if category == '全部':
+        return product_filter(request)
     if category == '手机':
         return cellphone_filter(request)
     if category == '冰箱':
@@ -368,17 +370,13 @@ def get_products_by_category(request, category):
     return None, None, None
 
 
-def category_list_page(request):
-    return render(request, 'categories.html')
-
-
 def takeFirst(elem):
     return elem[0]
 
 
 def products_filter(request, category):
     if not category:
-        return category_list_page(request)
+        return index(request)
     page = request.GET.get('page')
     common = request.GET.get('common')
     sort_list = {'price': ('价格', request.GET.get('price')), 'score': ('评分', request.GET.get('score')),
@@ -447,7 +445,8 @@ def products_filter(request, category):
                                                     'max_page': paginator.num_pages, 'total_result': total_result,
                                                     'category': category, 'filter_list': filter_list,
                                                     'filtered': filtered if filtered else None,
-                                                    'sort_list': sort_list, 'common': common})
+                                                    'sort_list': sort_list, 'common': common,
+                                                    'search_string': request.GET.get('str')})
 
 
 def get_cellphone_detail(product):
@@ -475,12 +474,16 @@ def products_detail(request, product_id):
     product = Product.objects.filter(id=product_id).first()
     type_name = type(product).__name__
     detail_list = []
+    model = Product
+    category = ''
     if type_name == 'Cellphone':
         detail_list = get_cellphone_detail(product)
         model = Cellphone
+        category = '手机'
     compare_list = compare_same_model(request, model, product_id)
 
-    return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list, 'compare_list': compare_list})
+    return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list,
+                                                    'compare_list': compare_list, 'category': category})
 
 
 def compare_same_model(request, model, product_id):
