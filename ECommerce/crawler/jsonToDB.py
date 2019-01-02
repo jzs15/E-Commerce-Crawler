@@ -16,7 +16,7 @@ def save_to_db(info, model):
 JSON_DATA = 'json_data/'
 connect(DATABASE_NAME)
 
-with open(JSON_DATA + 'Refrigerator.json', 'r') as json_file:
+with open(JSON_DATA + 'Cellphone.json', 'r') as json_file:
     data = json.load(fp=json_file)
     for datum in data:
-        save_to_db(datum, Refrigerator)
+        save_to_db(datum, Cellphone)

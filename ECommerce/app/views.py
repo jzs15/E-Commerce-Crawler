@@ -21,7 +21,7 @@ def search(request):
     words = thu.cut(search_string, text=True).split()
     q_object = Q()
     for word in words:
-        q_object |= (Q(title__icontains=word) | Q(model__icontains=word))
+        q_object &= (Q(title__icontains=word) | Q(model__icontains=word))
     items = Product.objects.filter(q_object)
     print(len(items))
     paginator = Paginator(items, 60)
@@ -108,7 +108,7 @@ def get_products_by_search(products, search_string):
     words = words.split()
     q_object = Q()
     for word in words:
-        q_object |= (Q(title__icontains=word) | Q(model__icontains=word))
+        q_object &= (Q(title__icontains=word) | Q(model__icontains=word))
     return products.filter(q_object)
 
 
@@ -132,6 +132,8 @@ def network_filter(products, net):
 
 
 def get_price_range_filter_list(products):
+    if not products:
+        return []
     max_price = products.order_by('-price')[0].price
     filter_list = []
     for i in range(int(max_price / 1000) + 1):
@@ -484,6 +486,6 @@ def products_detail(request, product_id):
 def compare_same_model(request, model, product_id):
     product = model.objects.filter(id=product_id).first()
     products = model.objects.filter(brand=product.brand)
-    products = products.filter(model=product.model)
+    products = products.filter(Q(model__iexact=product.model))
     products = products.order_by('platform')
     return products

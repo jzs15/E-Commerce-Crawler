@@ -53,11 +53,11 @@ def delete_model_name(model, std_list):
         for v in value:
             re_v = re.compile(v, re.IGNORECASE)
             model = re_v.sub('', model).strip()
-            if model.count('（') > 0:
-                if model[0] == '（':
-                    model = model[1:].strip()
-                if model[0] == '）':
-                    model = model[1:].strip()
+    if model:
+        if model[0] == '（':
+             model = model[1:].strip()
+        if model[0] == '）':
+            model = model[1:].strip()
 
     return model
 
