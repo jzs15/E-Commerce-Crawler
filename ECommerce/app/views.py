@@ -437,12 +437,6 @@ def washer_filter(request):
     if drain_method:
         products = products.filter(drain_method=drain_method)
         filtered.append(('排水方式', 'drain_method', drain_method))
-    if wash_volume:
-        products = products.filter(wash_volume=wash_volume)
-        filtered.append(('洗衣容量', 'wash_volume', wash_volume))
-    if dewater_volume:
-        products = products.filter(dewater_volume=dewater_volume)
-        filtered.append(('脱水容量', 'dewater_volume', dewater_volume))
     if rank:
         products = products.filter(rank=rank)
         filtered.append(('国家能效等级', 'rank', rank))
@@ -462,10 +456,6 @@ def washer_filter(request):
         filter_list.append(('开门方式', 'open_method', get_filter_list(products, 'open_method')))
     if not drain_method:
         filter_list.append(('排水方式', 'drain_method', get_filter_list(products, 'drain_method')))
-    if not wash_volume:
-        filter_list.append(('洗衣容量', 'wash_volume', get_filter_list(products, 'wash_volume')))
-    if not dewater_volume:
-        filter_list.append(('脱水容量', 'dewater_volume', get_filter_list(products, 'dewater_volume')))
     if not rank:
         filter_list.append(('国家能效等级', 'rank', get_filter_list(products, 'rank')))
     if not price_range:
@@ -611,7 +601,7 @@ def get_laptop_detail(product):
     return [
         [('品牌', product.brand), ('上市时间', product.date), ('颜色', product.color)],
         [('操作系统', product.os), ('核心数', product.core), ('CPU型号', product.cpu)],
-        [('内存容量', product.ram), ('硬盘类型', product.ssd), ('硬盘容量', product.hdd)],
+        [('内存容量', product.ram), ('固态硬盘', product.ssd), ('机械硬盘', product.hdd)],
         [('显卡型号', product.graphic_card), ('重量', product.weight), ('屏幕分辨率', product.frequency)],
     ]
 
@@ -620,7 +610,7 @@ def get_desktop_detail(product):
     return [
         [('品牌', product.brand), ('上市时间', product.date), ('颜色', product.color)],
         [('操作系统', product.os), ('核心数', product.core), ('CPU型号', product.cpu)],
-        [('内存容量', product.ram), ('硬盘类型', product.ssd), ('硬盘容量', product.hdd)],
+        [('内存容量', product.ram), ('固态硬盘', product.ssd), ('机械硬盘', product.hdd)],
         [('显卡型号', product.graphic_card), ('重量', product.weight)],
     ]
 

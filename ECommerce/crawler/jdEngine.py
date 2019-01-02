@@ -231,6 +231,14 @@ class JDEngine:
                     break
         return info
 
+    def television_spider(self, root):
+        info = dict()
+        return info
+
+    def washer_spider(self, root):
+        info = dict()
+        return info
+
     def crawler(self, cat):
         n = self.get_max_page(cat)
         spider = None
@@ -247,6 +255,12 @@ class JDEngine:
         elif cat == '670,671,673':
             spider = self.desktop_spider
             model = Desktop
+        elif cat == '737,794,798':
+            spider = self.television_spider
+            model = Television
+        elif cat == '737,794,880':
+            spider = self.washer_spider
+            model = Washer
         for i in range(n):
             url = "https://list.jd.com/list.html?cat={}&page=".format(cat) + str(i)
             res = get_request(url, self.session)
