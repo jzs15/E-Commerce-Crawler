@@ -63,7 +63,6 @@ def get_filter_list_data(model, value):
     mb = []
     gb = []
     tb = []
-    etc = []
     for x in lst:
         if 'MB' in x and x[:-2].isnumeric():
             mb.append(int(x[:-2]))
@@ -71,11 +70,9 @@ def get_filter_list_data(model, value):
             gb.append(int(x[:-2]))
         elif 'TB' in x and x[:-2].isnumeric():
             gb.append(int(x[:-2]))
-        else:
-            etc.append(x)
     mb.sort(reverse=True)
     gb.sort(reverse=True)
-    lst = [str(x) + 'TB' for x in tb] + [str(x) + 'GB' for x in gb] + [str(x) + 'MB' for x in mb] + etc
+    lst = [str(x) + 'TB' for x in tb] + [str(x) + 'GB' for x in gb] + [str(x) + 'MB' for x in mb]
 
     if '其他' in lst:
         lst.remove('其他')
@@ -138,6 +135,7 @@ def get_price_range_filter_list(products):
     filter_list = []
     for i in range(int(max_price / 1000) + 1):
         filter_list.append(str(i * 1000) + '~' + str((i + 1) * 1000))
+    filter_list += [''] * (8 - len(filter_list) % 8)
     return [filter_list[i:i + 8] for i in range(0, len(filter_list), 8)]
 
 
@@ -267,7 +265,7 @@ def refrigerator_filter(request):
         filtered.append(('电压/频率', 'voltFre', voltFre))
     if rank:
         products = products.filter(rank=rank)
-        filtered.append(('国家能效等级', 'rank', rank))
+        filtered.append(('能效等级', 'rank', rank))
     if method:
         products = products.filter(method=method)
         filtered.append(('开门方式', 'method', method))
@@ -288,7 +286,7 @@ def refrigerator_filter(request):
     if not voltFre:
         filter_list.append(('电压/频率', 'voltFre', get_filter_list(products, 'voltFre')))
     if not rank:
-        filter_list.append(('国家能效等级', 'rank', get_filter_list(products, 'rank')))
+        filter_list.append(('能效等级', 'rank', get_filter_list(products, 'rank')))
     if not method:
         filter_list.append(('开门方式', 'method', get_filter_list(products, 'method')))
     if not price_range:
@@ -423,9 +421,9 @@ def television_filter(request):
     if not os:
         filter_list.append(('操作系统', 'os', get_filter_list(products, 'os')))
     if not ram:
-        filter_list.append(('RAM', 'ram', get_filter_list(products, 'ram')))
+        filter_list.append(('RAM', 'ram', get_filter_list_data(products, 'ram')))
     if not rom:
-        filter_list.append(('ROM', 'rom', get_filter_list(products, 'rom')))
+        filter_list.append(('ROM', 'rom', get_filter_list_data(products, 'rom')))
     if not price_range:
         filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
     if not color:
@@ -446,8 +444,6 @@ def washer_filter(request):
     brand = request.GET.get('brand')
     open_method = request.GET.get('open_method')
     drain_method = request.GET.get('drain_method')
-    wash_volume = request.GET.get('wash_volume')
-    dewater_volume = request.GET.get('dewater_volume')
     rank = request.GET.get('rank')
     price_range = request.GET.get('price_range')
 
@@ -462,7 +458,7 @@ def washer_filter(request):
         filtered.append(('排水方式', 'drain_method', drain_method))
     if rank:
         products = products.filter(rank=rank)
-        filtered.append(('国家能效等级', 'rank', rank))
+        filtered.append(('能效等级', 'rank', rank))
     if price_range:
         products = price_range_filter(products, price_range)
         filtered.append(('价格范围', 'price_range', price_range))
@@ -480,7 +476,7 @@ def washer_filter(request):
     if not drain_method:
         filter_list.append(('排水方式', 'drain_method', get_filter_list(products, 'drain_method')))
     if not rank:
-        filter_list.append(('国家能效等级', 'rank', get_filter_list(products, 'rank')))
+        filter_list.append(('能效等级', 'rank', get_filter_list(products, 'rank')))
     if not price_range:
         filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
     if not color:
@@ -502,7 +498,7 @@ def get_products_by_category(request, category):
         return computer_filter(request, Laptop)
     if category == '台式电脑':
         return computer_filter(request, Desktop)
-    if category == '电视':
+    if category == '电视机':
         return television_filter(request)
     if category == '洗衣机':
         return washer_filter(request)
@@ -613,7 +609,7 @@ def get_refrigerator_detail(product):
     return [
         [('品牌', product.brand), ('上市时间', product.date), ('颜色', product.color)],
         [('开门方式', product.open_method), ('气候类型', product.weather), ('电压/频率', product.VoltFre)],
-        [('国家能效等级', product.rank), ('冷冻能力', product.ability), ('制冷方式', product.method)],
+        [('能效等级', product.rank), ('冷冻能力', product.ability), ('制冷方式', product.method)],
         [('运转音dB(A)', product.dB), ('产品重量', product.weight), ('冷藏室容积', product.cold_volume)],
         [('冷冻室容积', product.ice_volume), ('外形尺寸（宽*深*高）', product.form_size), ('包装尺寸（宽*深*高）', product.case_size)],
     ]
@@ -653,7 +649,7 @@ def get_washer_detail(product):
         [('品牌', product.brand), ('上市时间', product.date), ('颜色', product.color)],
         [('开门方式', product.open_method), ('排水方式', product.drain_method), ('产品重量', product.weight)],
         [('洗衣容量', product.wash_volume), ('脱水容量', product.dewater_volume)],
-        [('外形尺寸（宽*深*高）', product.size), ('国家能效等级', product.rank)],
+        [('外形尺寸（宽*深*高）', product.size), ('能效等级', product.rank)],
     ]
 
 

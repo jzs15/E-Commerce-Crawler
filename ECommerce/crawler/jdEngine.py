@@ -28,6 +28,16 @@ class JDEngine:
                                  ('frequency', '物理分辨率')]
         self.desktop_info_list = [('color', '颜色'), ('os', '操作系统'), ('cpu', 'CPU型号'),
                                   ('graphic_card', '显示芯片'), ('weight', '重量')]
+        self.television_info_list = [('color', '产品颜色'), ('os', '操作系统'),
+                                     ('frequency', '屏幕分辨率'), ('light', '背光源'),
+                                     ('ratio', '屏幕比例'), ('ram', '运行内存'), ('rom', '存储内存'),
+                                     ('machine_power', '电源功率（w）'), ('wait_power', '待机功率（w）'),
+                                     ('volt', '工作电压（v）'), ('size', '单屏尺寸（宽*高*厚）mm'),
+                                     ('weight', '单屏重量（kg）')
+                                     ]
+        self.washer_info_list = [('color', '颜色'), ('open_method', '开门方式'), ('drain_method', '排水方式'),
+                                 ('wash_volume', '洗涤容量（kg）'), ('weight', '产品重量（kg）'), ('size', '产品尺寸（深×宽×高）mm'),
+                                 ('rank', '能效等级')]
 
     def get_common_info(self, product_id, spider):
         url = "https://item.jd.com/{}.html".format(product_id)
@@ -164,7 +174,7 @@ class JDEngine:
         ab = re.compile('(\d+)核').findall(core)
         if ab:
             return ab[0]
-        cn_list = ['零', '一', '双', '三', '四', '五', '六', '七', '八', '九', '十']
+        cn_list = ['零', '单', '双', '三', '四', '五', '六', '七', '八', '九', '十']
         cn = re.compile('([\u4e00-\u9fa5]+)核').findall(core)
         if cn:
             return str(cn_list.index(cn[0]))
@@ -233,10 +243,36 @@ class JDEngine:
 
     def television_spider(self, root):
         info = dict()
+        for name, value in self.television_info_list:
+            info[name] = self.get_detail_info(root, value)
+        date = self.get_detail_info(root, '上市日期')
+        date = date.replace('约', '')
+        if '日' in date:
+            date = date.replace('年', '.').replace('月', '.').replace('日', '')
+        elif '月' in date:
+            date = date.replace('年', '.').replace('月', '')
+        else:
+            date = date.replace('年', '')
+        if '-' in date:
+            date = date.replace('-', '.', 3)
+        num = date.count('.')
+        if num == 2:
+            index = date.index('.', date.index('.') + 1)
+            date = date[:index]
+            index = date.index('.')
+            if len(date) - index < 3:
+                date = date[:index + 1] + '0' + date[index + 1:]
+        elif num == 1:
+            index = date.index('.')
+            if len(date) - index < 3:
+                date = date[:index + 1] + '0' + date[index + 1:]
+        info['date'] = date
         return info
 
     def washer_spider(self, root):
         info = dict()
+        for name, value in self.washer_info_list:
+            info[name] = self.get_detail_info(root, value)
         return info
 
     def crawler(self, cat):
@@ -262,7 +298,7 @@ class JDEngine:
             spider = self.washer_spider
             model = Washer
         for i in range(n):
-            url = "https://list.jd.com/list.html?cat={}&page=".format(cat) + str(i)
+            url = "https://list.jd.com/list.html?cat={}&page=".format(cat) + str(i + 1)
             res = get_request(url, self.session)
             if res is None:
                 continue
@@ -279,13 +315,17 @@ class JDEngine:
             self.isConnected = True
         if not info['title']:
             return
-
         products = model.objects.filter(url=info['url'])
         if products.first() is None:
             product = model(**info)
             product.save()
+            with open('JD_' + model.__name__ + '.json', 'a', encoding='utf-8') as json_file:
+                json_file.write(json.dumps(info) + ',\n')
         else:
-            products.update(**info)
+            try:
+                products.update(**info)
+            except IndexError:
+                pass
 
 
 def get_request(url, session, times=0):
@@ -312,10 +352,12 @@ def get_request(url, session, times=0):
 def main():
     start_time = time.time()
     jd = JDEngine()
-    # jd.crawler('9987,653,655')
-    # jd.crawler('737,794,878')
-    # jd.crawler('670,671,672')
-    jd.crawler('670,671,673')
+    # jd.crawler('9987,653,655') # 手机
+    # jd.crawler('737,794,878') # 冰箱
+    # jd.crawler('670,671,672') # 笔记本
+    # jd.crawler('670,671,673') # 台式电脑
+    # jd.crawler('737,794,798') # 电视
+    jd.crawler('737,794,880') # 洗衣机
     print("--- %s seconds ---" % (time.time() - start_time))
 
 

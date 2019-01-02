@@ -2,7 +2,7 @@
 {% load static %}
 {% block content %}
     <div class="filter_mid">
-        <p><a href="{% url 'index' %}">类型</a>>{{ category }}</p>
+        <p><a href="{% url 'index' %}">分类</a>>{{ category }}</p>
     </div>
     <div class="filter_mid filter_select">
         <table class="table">
@@ -166,7 +166,7 @@
                             {{ product.score|floatformat:-2 }}分
                         </div>
                     </td>
-                    <td width="20%" colspan="2">
+                    <td width="25%" colspan="2">
                         {% if product.platform == '京东' %}
                             <p align="right"><img src="{% static 'img/jd.ico' %}" alt="" width="15px">京东商城</p>
                         {% elif product.platform == '苏宁' %}
