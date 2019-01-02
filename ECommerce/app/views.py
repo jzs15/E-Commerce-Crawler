@@ -252,7 +252,6 @@ def refrigerator_filter(request):
     platform = request.GET.get('platform')
     brand = request.GET.get('brand')
     weather = request.GET.get('weather')
-    voltFre = request.GET.get('voltFre')
     rank = request.GET.get('rank')
     method = request.GET.get('method')
     price_range = request.GET.get('price_range')
@@ -262,9 +261,6 @@ def refrigerator_filter(request):
     if weather:
         products = products.filter(weather=weather)
         filtered.append(('气候类型', 'weather', weather))
-    if voltFre:
-        products = products.filter(voltFre=voltFre)
-        filtered.append(('电压/频率', 'voltFre', voltFre))
     if rank:
         products = products.filter(rank=rank)
         filtered.append(('国家能效等级', 'rank', rank))
@@ -285,8 +281,6 @@ def refrigerator_filter(request):
         filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
     if not weather:
         filter_list.append(('气候类型', 'weather', get_filter_list(products, 'weather')))
-    if not voltFre:
-        filter_list.append(('电压/频率', 'voltFre', get_filter_list(products, 'voltFre')))
     if not rank:
         filter_list.append(('国家能效等级', 'rank', get_filter_list(products, 'rank')))
     if not method:
@@ -502,7 +496,7 @@ def get_products_by_category(request, category):
         return computer_filter(request, Laptop)
     if category == '台式电脑':
         return computer_filter(request, Desktop)
-    if category == '电视':
+    if category == '电视机':
         return television_filter(request)
     if category == '洗衣机':
         return washer_filter(request)
@@ -612,7 +606,7 @@ def get_cellphone_detail(product):
 def get_refrigerator_detail(product):
     return [
         [('品牌', product.brand), ('上市时间', product.date), ('颜色', product.color)],
-        [('开门方式', product.open_method), ('气候类型', product.weather), ('电压/频率', product.VoltFre)],
+        [('开门方式', product.open_method), ('气候类型', product.weather), ('电压/频率', product.voltFre)],
         [('国家能效等级', product.rank), ('冷冻能力', product.ability), ('制冷方式', product.method)],
         [('运转音dB(A)', product.dB), ('产品重量', product.weight), ('冷藏室容积', product.cold_volume)],
         [('冷冻室容积', product.ice_volume), ('外形尺寸（宽*深*高）', product.form_size), ('包装尺寸（宽*深*高）', product.case_size)],

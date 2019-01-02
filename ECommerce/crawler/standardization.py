@@ -74,14 +74,52 @@ def change_name(data, std_list):
     return data
 
 
+def change_weather(weather):
+    if weather == '其他' or weather == '其它':
+        return '其他'
+    if re.match('[^a-zA-Z]*([a-zA-Z]+)', weather) is None:
+        return weather
+    wth = ""
+    if 'N' in weather:
+        if weather[weather.find('N') - 1] != 'S':
+            wth += "温带型"
+    if 'T' in weather:
+        if weather[weather.find('T') - 1] != 'S':
+            wth += "热带型" if len(wth) == 0 else "/热带型"
+    if 'SN' in weather:
+        wth += "亚温带型" if len(wth) == 0 else "/亚温带型"
+    if 'ST' in weather:
+        wth += "亚热带型" if len(wth) == 0 else "/亚热带型"
+    return wth
+
+
+def change_brand(brand):
+    brand = brand.replace('（', '(', brand.count('（'))
+    brand = brand.replace('）', ')', brand.count('）'))
+    num = brand.count('(')
+    for i in range(num):
+        index1 = brand.find('(')
+        index2 = brand.find(')')
+        brand = brand[:index1] + brand[index2+1:]
+    return brand
+
+
 def standardization():
     connect(DATABASE_NAME)
     products = Cellphone.objects.all()
     for product in products:
         product.brand = change_name(product.brand, cellphone_brand_list)
+        product.brand = change_brand(product.brand)
         product.model = delete_model_name(product.model, cellphone_brand_list)
         product.os = change_name(product.os, os_list)
         product.cpu = change_name(product.cpu, cpu_brand_list)
+        product.save()
+
+    products = Refrigerator.objects.all()
+    for product in products:
+        product.brand = change_brand(product.brand)
+        product.rank = product.rank.replace(' ', '', 3)
+        product.weather = change_weather(product.weather)
         product.save()
 
 

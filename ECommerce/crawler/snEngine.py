@@ -17,7 +17,7 @@ class SDEngine:
         self.common_info_list = ['image', 'title', 'shop_name', 'url', 'price', 'comment_num', 'score']
         self.cellphone_info_list_en = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
         self.cellphone_info_list_cn = ['品牌', '型号', '上市时间', '手机操作系统', 'CPU品牌', '运行内存', '机身内存', '机身长度', '机身宽度', '机身厚度', '重量', '屏幕尺寸', '屏幕分辨率', '颜色', '4G网络制式']
-        self.refrigerator_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'weather', 'VoltFre', 'rank', 'ability', 'method', 'dB', 'weight', 'cold_volume', 'ice_volume', 'form_size', 'case_size']
+        self.refrigerator_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'weather', 'voltFre', 'rank', 'ability', 'method', 'dB', 'weight', 'cold_volume', 'ice_volume', 'form_size', 'case_size']
         self.refrigerator_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '气候类型', '电压/频率', '国家能效等级', '冷冻能力', '制冷方式', '运转音dB(A)', '产品重量', '冷藏室容积', '冷冻室容积', '外形尺寸（宽*深*高）', '包装尺寸（宽*深*高）']
         self.laptop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd', 'graphic_card', 'weight', 'frequency']
         self.laptop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号', '重量', '屏幕分辨率']
