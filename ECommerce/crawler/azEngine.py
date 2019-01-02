@@ -199,6 +199,11 @@ class AZEngine:
         else:
             products.update(**info)
 
+    def run(self):
+        print('AMAZON start')
+        self.crawler('665002051')   #cellphone
+        print('AMAZON end')
+
 
 def get_request(url, session, times=0):
     if times >= 10:

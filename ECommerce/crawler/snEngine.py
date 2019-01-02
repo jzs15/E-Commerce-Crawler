@@ -9,6 +9,7 @@ from mongoengine import *
 from selenium.common.exceptions import NoSuchElementException
 import traceback
 from multiprocessing import Pool, cpu_count
+import sys
 
 
 class SDEngine:
@@ -249,6 +250,16 @@ class SDEngine:
         return {'china_mobile': china_mobile, 'china_unicom': china_unicom, 'china_telecom': china_telecom,
                 'all_kind': all_kind}
 
+    def run(self):
+        print('SUNING start')
+        self.crawling('0-20002-')    #cellphone
+        self.crawling('0-244005-')   #refrigerator
+        self.crawling('0-258004-')   #laptop
+        self.crawling('0-258009-')   #desktop
+        self.crawling('0-293006-')   #television
+        self.crawling('0-244006-')  # washer
+        print('SUNING end')
+
 
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
@@ -262,4 +273,5 @@ def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
 
-main()
+if __name__ == '__main__':
+    sys.exit(main())

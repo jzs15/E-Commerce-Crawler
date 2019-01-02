@@ -284,6 +284,11 @@ class TBEngine:
         self.driver.get('https://login.taobao.com')
         input("Continue?")
 
+    def run(self):
+        print('TAOBAO start')
+        self.crawler('手机')
+        print('TAOBAO end')
+
 
 def get_request(url, session, times=0):
     if times >= 10:

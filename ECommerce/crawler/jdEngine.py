@@ -327,6 +327,16 @@ class JDEngine:
             except IndexError:
                 pass
 
+    def run(self):
+        print('JINGDONG start')
+        self.crawler('9987,653,655')   #cellphone
+        self.crawler('737,794,878')   #refrigerator
+        self.crawler('670,671,672')   #laptop
+        self.crawler('670,671,673')   #desktop
+        self.crawler('737,794,798')   #television
+        self.crawler('737,794,880')  # washer
+        print('JINGDONG end')
+
 
 def get_request(url, session, times=0):
     if times >= 10:
