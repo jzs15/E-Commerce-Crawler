@@ -414,7 +414,7 @@ def television_filter(request):
 
 
 def washer_filter(request):
-    products = Television.objects.all()
+    products = Washer.objects.all()
     filtered = []
     filter_list = []
     products = get_products_by_search(products, request.GET.get('str'))
