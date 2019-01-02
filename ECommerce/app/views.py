@@ -69,7 +69,7 @@ def get_filter_list_data(model, value):
         elif 'GB' in x and x[:-2].isnumeric():
             gb.append(int(x[:-2]))
         elif 'TB' in x and x[:-2].isnumeric():
-            gb.append(int(x[:-2]))
+            tb.append(int(x[:-2]))
     mb.sort(reverse=True)
     gb.sort(reverse=True)
     lst = [str(x) + 'TB' for x in tb] + [str(x) + 'GB' for x in gb] + [str(x) + 'MB' for x in mb]
@@ -253,6 +253,7 @@ def refrigerator_filter(request):
     weather = request.GET.get('weather')
     rank = request.GET.get('rank')
     method = request.GET.get('method')
+    open_method = request.GET.get('open_method')
     price_range = request.GET.get('price_range')
     if brand:
         products = products.filter(brand=brand)
@@ -265,7 +266,10 @@ def refrigerator_filter(request):
         filtered.append(('能效等级', 'rank', rank))
     if method:
         products = products.filter(method=method)
-        filtered.append(('开门方式', 'method', method))
+        filtered.append(('制冷方式', 'method', method))
+    if open_method:
+        products = products.filter(open_method=open_method)
+        filtered.append(('开门方式', 'open_method', open_method))
     if price_range:
         products = price_range_filter(products, price_range)
         filtered.append(('价格范围', 'price_range', price_range))
@@ -283,7 +287,9 @@ def refrigerator_filter(request):
     if not rank:
         filter_list.append(('能效等级', 'rank', get_filter_list(products, 'rank')))
     if not method:
-        filter_list.append(('开门方式', 'method', get_filter_list(products, 'method')))
+        filter_list.append(('制冷方式', 'method', get_filter_list(products, 'method')))
+    if not open_method:
+        filter_list.append(('开门方式', 'open_method', get_filter_list(products, 'open_method')))
     if not price_range:
         filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
     if not color:
@@ -304,11 +310,9 @@ def computer_filter(request, model):
     brand = request.GET.get('brand')
     os = request.GET.get('os')
     core = request.GET.get('core')
-    cpu = request.GET.get('cpu')
     ram = request.GET.get('ram')
     hdd = request.GET.get('hdd')
     ssd = request.GET.get('ssd')
-    graphic_card = request.GET.get('graphic_card')
     price_range = request.GET.get('price_range')
     if brand:
         products = products.filter(brand=brand)
@@ -316,9 +320,6 @@ def computer_filter(request, model):
     if os:
         products = products.filter(os=os)
         filtered.append(('操作系统', 'os', os))
-    if cpu:
-        products = products.filter(cpu=cpu)
-        filtered.append(('CPU', 'cpu', cpu))
     if core:
         products = products.filter(core=core)
         filtered.append(('核心数', 'core', core))
@@ -331,9 +332,6 @@ def computer_filter(request, model):
     if ssd:
         products = products.filter(ssd=ssd)
         filtered.append(('固态硬盘', 'ssd', ssd))
-    if graphic_card:
-        products = products.filter(graphic_card=graphic_card)
-        filtered.append(('显卡', 'graphic_card', graphic_card))
     if price_range:
         products = price_range_filter(products, price_range)
         filtered.append(('价格范围', 'price_range', price_range))
@@ -348,8 +346,6 @@ def computer_filter(request, model):
         filter_list.append(('品牌', 'brand', get_filter_list(products, 'brand')))
     if not os:
         filter_list.append(('操作系统', 'os', get_filter_list(products, 'os')))
-    if not cpu:
-        filter_list.append(('CPU', 'cpu', get_filter_list(products, 'cpu')))
     if not core:
         filter_list.append(('核心数', 'core', get_filter_list_sorted(products, 'core')))
     if not ram:
@@ -358,8 +354,6 @@ def computer_filter(request, model):
         filter_list.append(('机械硬盘', 'hdd', get_filter_list_data(products, 'hdd')))
     if not ssd:
         filter_list.append(('固态硬盘', 'ssd', get_filter_list_data(products, 'ssd')))
-    if not graphic_card:
-        filter_list.append(('显卡', 'graphic_card', get_filter_list(products, 'graphic_card')))
     if not price_range:
         filter_list.append(('价格范围', 'price_range', get_price_range_filter_list(products)))
     if not color:

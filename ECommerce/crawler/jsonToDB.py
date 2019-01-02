@@ -16,7 +16,7 @@ def save_to_db(info, model):
 JSON_DATA = 'C:/Users/youkg/Desktop/json/'
 connect(DATABASE_NAME)
 
-with open(JSON_DATA + 'Cellphone.json', 'r') as json_file:
+with open(JSON_DATA + 'JD_Laptop.json', 'r') as json_file:
     data = json.load(fp=json_file)
     for datum in data:
-        save_to_db(datum, Cellphone)
+        save_to_db(datum, Laptop)
