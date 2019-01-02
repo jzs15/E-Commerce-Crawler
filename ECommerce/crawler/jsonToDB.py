@@ -13,7 +13,7 @@ def save_to_db(info, model):
         products.update(**info)
 
 
-JSON_DATA = 'json_data/'
+JSON_DATA = 'C:/Users/youkg/Desktop/json/'
 connect(DATABASE_NAME)
 
 with open(JSON_DATA + 'Cellphone.json', 'r') as json_file:
