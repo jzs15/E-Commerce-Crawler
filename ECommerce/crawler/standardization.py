@@ -1,6 +1,7 @@
 from app.models import *
 from mongoengine import *
 from ECommerce.settings import DATABASE_NAME
+import re
 
 cellphone_brand_list = {
     '华为': ['华为', 'HUAWEI'],
@@ -47,22 +48,28 @@ def change_etc(data):
 
 
 def delete_model_name(model, std_list):
-    model_upper = model.upper().strip()
+    model = model.strip()
     for key, value in std_list.items():
         for v in value:
-            if v in model_upper:
-                model_upper = model_upper.replace(v, '').strip()
-    return model_upper
+            re_v = re.compile(v, re.IGNORECASE)
+            model = re_v.sub('', model).strip()
+            if model.count('（') > 0:
+                if model[0] == '（':
+                    model = model[1:].strip()
+                if model[0] == '）':
+                    model = model[1:].strip()
+
+    return model
 
 
 def change_name(data, std_list):
     data = change_etc(data)
     if data == '其他':
         return data
-    brand_upper = data.upper()
+    data_upper = data.upper()
     for key, value in std_list.items():
         for v in value:
-            if v in brand_upper:
+            if v in data_upper:
                 return key
     return data
 

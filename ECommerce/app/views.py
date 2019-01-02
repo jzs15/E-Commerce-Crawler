@@ -255,20 +255,35 @@ def products_filter(request, category):
         products = paginator.page(paginator.num_pages)
 
     if search_string:
-        search_string = search_string.upper()
-        for product in products:
-            l = len(search_string)
-            if search_string in product.model.upper():
-                model = product.model
-                model_upper = model.upper()
-                model_index = model_upper.index(search_string)
-                product.model = model[:model_index] + '<em style="color: #c00;">' + model[model_index:model_index + l] + '</em>' + model[model_index + l:]
-            if search_string in product.title.upper():
-                title = product.title
-                title_upper = title.upper()
-                title_index = title_upper.index(search_string)
-                product.title = title[:title_index] + '<em style="color: #c00;">' + title[title_index:title_index + l] + '</em>' + title[title_index + l:]
-
+        thu = thulac.thulac(seg_only=True)
+        words = thu.cut(search_string, text=True)
+        words = words.split()
+        for word in words:
+            search_string = word.upper()
+            for product in products:
+                l = len(search_string)
+                if search_string in product.model.upper():
+                    model = product.model
+                    model_upper = model.upper()
+                    num = model_upper.count(search_string)
+                    last_index = -1
+                    for i in range(num):
+                        model_index = model_upper.index(search_string, last_index + 1)
+                        last_index = model_index + 30
+                        model = model[:model_index] + '<em style="color: #c00;">' + model[model_index:model_index + l] + '</em>' + model[model_index + l:]
+                        model_upper = model.upper()
+                    product.model = model
+                if search_string in product.title.upper():
+                    title = product.title
+                    title_upper = title.upper()
+                    num = title_upper.count(search_string)
+                    last_index = -1
+                    for i in range(num):
+                        title_index = title_upper.index(search_string, last_index + 1)
+                        last_index = title_index + 30
+                        title = title[:title_index] + '<em style="color: #c00;">' + title[title_index:title_index + l] + '</em>' + title[title_index + l:]
+                        title_upper = title.upper()
+                    product.title = title
 
     return render(request, 'products_filter.html', {'products': products,
                                                     'max_page': paginator.num_pages, 'total_result': total_result,

@@ -53,10 +53,11 @@ class SDEngine:
             driver.get("https://list.suning.com/" + category + str(page) + ".html")
             for i in range(5):
                 driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-                time.sleep(1)
+                time.sleep(2)
             ID_list = driver.find_element_by_id('product-list').find_elements_by_xpath(".//ul/li[@id]")
             for id in ID_list:
                 id_list.append(id.get_attribute('id').replace('-', '/'))
+        print('len =', len(id_list))
         return id_list
 
     def init_dict(self, m_dict, model):
@@ -106,17 +107,15 @@ class SDEngine:
     def get_common_info(driver, m_dict):
         infoMain = driver.find_element_by_class_name('proinfo-title')
         m_dict['image'] = driver.find_element_by_id('bigImg').find_element_by_xpath('.//img').get_attribute('src')
-        m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text.replace('自营', '').replace(
-            '\n', '')
+        m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text.replace('自营', '').replace('\n', '')
         m_dict['price'] = float(driver.find_element_by_class_name('mainprice').text.replace('¥', ''))
         try:
             m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath(
                 './/a').get_attribute('innerHTML')
         except:
             m_dict['shop_name'] = '苏宁自营'
-
         driver.find_element_by_xpath('//li[@id="productCommTitle"]/a').click()
-        driver.implicitly_wait(3)
+        driver.implicitly_wait(5)
         comment = driver.find_element_by_css_selector("[class='rv-place-item clearfix']")
         score = 5 * int(
             comment.find_element_by_xpath(".//li[@data-type='good']").get_attribute('data-num')) + 3 * int(
@@ -188,7 +187,6 @@ class SDEngine:
                 m_dict['ssd'] = size[1]
 
     def crawling(self, category):
-        page_num = self.get_page_num(category)
         if category == '0-20002-':
             info_list_en = self.cellphone_info_list_en
             info_list_cn = self.cellphone_info_list_cn
@@ -215,6 +213,7 @@ class SDEngine:
             model = Washer
         else:
             return
+        page_num = self.get_page_num(category)
         id_list = self.get_id_list(page_num, category)
         info = dict()
         driver = webdriver.Chrome()
@@ -227,9 +226,13 @@ class SDEngine:
                 self.get_common_info(driver, info)
                 self.detail_info_crawler(driver, info, info_list_en, info_list_cn)
             except Exception as e:
+                print('exception')
                 continue
             if self.is_valid(info):
+                print('save')
                 self.save_to_db(info, model)
+            else:
+                print('no')
 
     @staticmethod
     def get_network_info(net):
