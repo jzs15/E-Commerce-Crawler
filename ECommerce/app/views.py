@@ -370,6 +370,10 @@ def category_list_page(request):
     return render(request, 'categories.html')
 
 
+def takeFirst(elem):
+    return elem[0]
+
+
 def products_filter(request, category):
     if not category:
         return category_list_page(request)
@@ -377,6 +381,8 @@ def products_filter(request, category):
     common = request.GET.get('common')
     sort_list = {'price': ('价格', request.GET.get('price')), 'score': ('评分', request.GET.get('score')),
                  'date': ('上市时间', request.GET.get('date')), 'comment_num': ('全网评论数', request.GET.get('comment_num'))}
+    search_string = request.GET.get('str')
+    url = request.get_full_path()
     sorted_list = []
     products, filtered, filter_list = get_products_by_category(request, category)
     if products is None:
@@ -387,10 +393,13 @@ def products_filter(request, category):
             if value[1] is None:
                 continue
             elif value[1] == 'up':
-                sorted_list.append(name)
+                sorted_list.append((url.index(name), name))
             else:
-                sorted_list.append('-' + name)
-        products = products.order_by(*sorted_list)
+                sorted_list.append((url.index(name), '-' + name))
+        sorted_list.sort(key=takeFirst)
+        sorted_list = [i[1] for i in sorted_list]
+        if len(sorted_list) > 0:
+            products = products.order_by(*sorted_list)
 
     total_result = len(products)
     paginator = Paginator(products, 60)
@@ -400,6 +409,37 @@ def products_filter(request, category):
         products = paginator.page(1)
     except EmptyPage:
         products = paginator.page(paginator.num_pages)
+
+    if search_string:
+        thu = thulac.thulac(seg_only=True)
+        words = thu.cut(search_string, text=True)
+        words = words.split()
+        for word in words:
+            search_string = word.upper()
+            for product in products:
+                l = len(search_string)
+                if search_string in product.model.upper():
+                    model = product.model
+                    model_upper = model.upper()
+                    num = model_upper.count(search_string)
+                    last_index = -1
+                    for i in range(num):
+                        model_index = model_upper.index(search_string, last_index + 1)
+                        last_index = model_index + 30
+                        model = model[:model_index] + '<em style="color: #c00;">' + model[model_index:model_index + l] + '</em>' + model[model_index + l:]
+                        model_upper = model.upper()
+                    product.model = model
+                if search_string in product.title.upper():
+                    title = product.title
+                    title_upper = title.upper()
+                    num = title_upper.count(search_string)
+                    last_index = -1
+                    for i in range(num):
+                        title_index = title_upper.index(search_string, last_index + 1)
+                        last_index = title_index + 30
+                        title = title[:title_index] + '<em style="color: #c00;">' + title[title_index:title_index + l] + '</em>' + title[title_index + l:]
+                        title_upper = title.upper()
+                    product.title = title
 
     return render(request, 'products_filter.html', {'products': products,
                                                     'max_page': paginator.num_pages, 'total_result': total_result,
@@ -435,10 +475,15 @@ def products_detail(request, product_id):
     detail_list = []
     if type_name == 'Cellphone':
         detail_list = get_cellphone_detail(product)
+        model = Cellphone
+    compare_list = compare_same_model(request, model, product_id)
 
-    return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list})
+    return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list, 'compare_list': compare_list})
 
 
 def compare_same_model(request, model, product_id):
     product = model.objects.filter(id=product_id).first()
-    products = model.objects.filter(model=product.model)
+    products = model.objects.filter(brand=product.brand)
+    products = products.filter(model=product.model)
+    products = products.order_by('platform')
+    return products

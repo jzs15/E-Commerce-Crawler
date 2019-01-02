@@ -91,3 +91,13 @@ class Television(Product):
     size = StringField()
     weight = StringField()
 
+
+class Washer(Product):
+    color = StringField()
+    open_method = StringField()
+    drain_method = StringField()
+    weight = StringField()
+    wash_volume = StringField()
+    dewater_volume = StringField()
+    size = StringField()
+    rank = StringField()
