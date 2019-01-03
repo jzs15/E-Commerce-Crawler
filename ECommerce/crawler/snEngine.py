@@ -7,7 +7,6 @@ from ECommerce.settings import DATABASE_NAME
 from app.models import *
 from mongoengine import *
 from selenium.common.exceptions import NoSuchElementException
-import traceback
 from multiprocessing import Pool, cpu_count
 import sys
 
@@ -90,9 +89,6 @@ class SDEngine:
         m_dict['platform'] = '苏宁'
 
     def save_to_db(self, m_dict, model):
-        with open(model.__name__ + '.json', 'a', encoding='utf-8') as json_file:
-            json_file.write(json.dumps(m_dict) + ',\n')
-        '''
         if not self.is_connect:
             connect(DATABASE_NAME)
             self.is_connect = True
@@ -100,9 +96,10 @@ class SDEngine:
         if products.first() is None:
             product = model(**m_dict)
             product.save()
+            with open(model.__name__ + '.json', 'a', encoding='utf-8') as json_file:
+                json_file.write(json.dumps(m_dict) + ',\n')
         else:
             products.update(**m_dict)
-        '''
 
     @staticmethod
     def get_common_info(driver, m_dict):
