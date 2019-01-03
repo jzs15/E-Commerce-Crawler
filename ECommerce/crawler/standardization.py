@@ -49,7 +49,6 @@ computer_os = ['家庭版', '家庭中文版', '中文版', '专业版', '家庭
 etc_list = ['以官网信息为准', '--']
 
 
-
 def change_etc(data):
     if data in etc_list:
         return '其他'

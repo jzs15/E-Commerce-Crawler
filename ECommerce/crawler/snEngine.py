@@ -114,7 +114,10 @@ class SDEngine:
                 './/a').get_attribute('innerHTML')
         except:
             m_dict['shop_name'] = '苏宁自营'
+        #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        #time.sleep(5)
         driver.find_element_by_xpath('//li[@id="productCommTitle"]/a').click()
+        #time.sleep(5)
         driver.implicitly_wait(5)
         comment = driver.find_element_by_css_selector("[class='rv-place-item clearfix']")
         score = 5 * int(
