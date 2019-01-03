@@ -34,9 +34,17 @@ cpu_brand_list = {
 }
 
 os_list = {
-    'Android': ['安卓', 'ANDROID'],
+    'Android': ['安卓', 'ANDROID', 'ANDRIOD'],
     'IOS': ['IOS'],
+    'YIUI': ['YIUI', '易柚'],
+    'FunUI': ['FUNUI'],
+    '酷开': ['酷开'],
+    'AI OS': ['AI OS'],
+    '其他': ['0', '-', '咨询客服'],
+    'MIUI': ['MI'],
 }
+
+computer_os = ['家庭版', '家庭中文版', '中文版', '专业版', '家庭普通版', '试用版', '正版']
 
 etc_list = ['以官网信息为准', '--']
 
@@ -71,7 +79,7 @@ def change_name(data, std_list):
         for v in value:
             if v in data_upper:
                 return key
-    return data
+    return data.strip()
 
 
 def change_weather(weather):
@@ -93,15 +101,28 @@ def change_weather(weather):
     return wth
 
 
-def change_brand(brand):
-    brand = brand.replace('（', '(', brand.count('（'))
-    brand = brand.replace('）', ')', brand.count('）'))
-    num = brand.count('(')
+def remove_bracket(model):
+    model = model.replace('（', '(', model.count('（'))
+    model = model.replace('）', ')', model.count('）'))
+    num = model.count('(')
     for i in range(num):
-        index1 = brand.find('(')
-        index2 = brand.find(')')
-        brand = brand[:index1] + brand[index2+1:]
-    return brand
+        index1 = model.find('(')
+        index2 = model.find(')')
+        model = model[:index1] + model[index2+1:]
+    return model
+
+
+def change_os(os):
+    for i in computer_os:
+        if i in os:
+            index = os.find(i)
+            os = os[:index] + os[index+len(i):]
+            os = os.strip()
+    if 'Win' in os and 'Windows' not in os:
+        index = os.find('Win')
+        os = os[:index] + 'Windows' + os[index+3:]
+    os = os.replace(' ', '', os.count(' '))
+    return os
 
 
 def standardization():
@@ -109,17 +130,43 @@ def standardization():
     products = Cellphone.objects.all()
     for product in products:
         product.brand = change_name(product.brand, cellphone_brand_list)
-        product.brand = change_brand(product.brand)
+        product.brand = remove_bracket(product.brand)
         product.model = delete_model_name(product.model, cellphone_brand_list)
         product.os = change_name(product.os, os_list)
         product.cpu = change_name(product.cpu, cpu_brand_list)
+        product.cpu = remove_bracket(product.cpu)
         product.save()
 
     products = Refrigerator.objects.all()
     for product in products:
-        product.brand = change_brand(product.brand)
-        product.rank = product.rank.replace(' ', '', product.count(' '))
+        product.brand = remove_bracket(product.brand)
+        product.rank = product.rank.replace(' ', '', product.rank.count(' '))
         product.weather = change_weather(product.weather)
+        product.method = remove_bracket(product.method)
+        product.save()
+
+    products = Washer.objects.all()
+    for product in products:
+        product.brand = remove_bracket(product.brand)
+        product.rank = product.rank.replace(' ', '', product.rank.count(' '))
+        product.save()
+
+    products = Laptop.objects.all()
+    for product in products:
+        product.brand = remove_bracket(product.brand)
+        product.os = change_os(product.os)
+        product.save()
+
+    products = Desktop.objects.all()
+    for product in products:
+        product.brand = remove_bracket(product.brand)
+        product.os = change_os(product.os)
+        product.save()
+
+    products = Television.objects.all()
+    for product in products:
+        product.brand = remove_bracket(product.brand)
+        product.os = change_name(product.os, os_list)
         product.save()
 
 
