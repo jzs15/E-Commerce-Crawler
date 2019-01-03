@@ -1,9 +1,10 @@
 from django.shortcuts import render, render_to_response
-from mongoengine.queryset.visitor import Q
 from django.core.paginator import Paginator, EmptyPage, PageNotAnInteger
 from app.models import *
 import collections
-import thulac
+import segmentation
+
+seg = segmentation.Segmentation()
 
 
 def index(request):
@@ -12,28 +13,6 @@ def index(request):
 
 def page_not_found(request):
     return render_to_response('404.html')
-
-
-def search(request):
-    page = request.GET.get('page')
-    search_string = request.GET.get('str')
-    thu = thulac.thulac(seg_only=True)
-    words = thu.cut(search_string, text=True).split()
-    q_object = Q()
-    for word in words:
-        q_object &= (Q(title__icontains=word) | Q(model__icontains=word))
-    items = Product.objects.filter(q_object)
-    print(len(items))
-    paginator = Paginator(items, 60)
-    try:
-        products = paginator.page(page)
-    except PageNotAnInteger:
-        products = paginator.page(1)
-    except EmptyPage:
-        products = paginator.page(paginator.num_pages)
-
-    return render(request, 'search.html', {'products': products, 'search_string': search_string,
-                                           'max_page': paginator.num_pages})
 
 
 def get_filter_list(model, value):
@@ -100,9 +79,7 @@ def get_filter_list_sorted(model, value):
 def get_products_by_search(products, search_string):
     if not search_string:
         return products
-    thu = thulac.thulac(seg_only=True)
-    words = thu.cut(search_string, text=True)
-    words = words.split()
+    words = seg.cut(search_string)
     q_object = Q()
     for word in words:
         q_object &= (Q(title__icontains=word) | Q(model__icontains=word))
@@ -541,9 +518,7 @@ def products_filter(request, category):
         products = paginator.page(paginator.num_pages)
 
     if search_string:
-        thu = thulac.thulac(seg_only=True)
-        words = thu.cut(search_string, text=True)
-        words = words.split()
+        words = seg.cut(search_string)
         for word in words:
             search_string = word.upper()
             for product in products:

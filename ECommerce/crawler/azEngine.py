@@ -7,7 +7,7 @@ from ECommerce.settings import DATABASE_NAME
 from mongoengine import *
 import time
 from crawler.util import *
-
+import json
 
 class AZEngine:
     def __init__(self):
@@ -150,8 +150,6 @@ class AZEngine:
                 info['thickness'] = size[4] + size[5]
         return info
 
-
-
     def cellphone_spider(self, root):
         info = dict()
         text = root.xpath('//td[@class="label" and text()="功能用途"]/'
@@ -176,13 +174,14 @@ class AZEngine:
             spider = self.cellphone_spider
             model = Cellphone
         for i in range(n):
-            url = "https://www.amazon.cn/s/ref=sv_cps_0?node={}&page={}".format(cat, i)
+            url = "https://www.amazon.cn/s/ref=sv_cps_0?node={}&page={}".format(cat, i + 1)
             res = get_request(url, self.session)
             if res is None:
                 continue
             res.encoding = 'utf-8'
             root = lxml.html.etree.HTML(res.text)
             ids = root.xpath('//div[@id="mainResults"]/ul/li/@data-asin')
+            ids = root.xpath('//div[@id="atfResults"]/ul/li/@data-asin') if not ids else ids
             for j in range(len(ids)):
                 info = self.get_common_info(re.sub('\s', '', ids[j]), spider)
                 self.save_to_db(info, model)
@@ -196,12 +195,14 @@ class AZEngine:
         if products.first() is None:
             product = model(**info)
             product.save()
+            with open('AZ_' + model.__name__ + '.json', 'a', encoding='utf-8') as json_file:
+                json_file.write(json.dumps(info) + ',\n')
         else:
             products.update(**info)
 
     def run(self):
         print('AMAZON start')
-        self.crawler('665002051')   #cellphone
+        self.crawler('665002051')  # cellphone
         print('AMAZON end')
 
 

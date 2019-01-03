@@ -9,6 +9,7 @@ import time
 from crawler.util import *
 from selenium import webdriver
 from selenium.common.exceptions import NoSuchElementException, WebDriverException, ElementNotVisibleException
+import json
 
 
 class TBEngine:
@@ -98,7 +99,7 @@ class TBEngine:
     def get_common_info(self, product_id, spider):
         time.sleep(2)
         url = 'https://item.taobao.com/item.htm?id={}'.format(product_id)
-        base_info = {'platform': '淘宝', 'url': url}
+        base_info = {'url': url}
         self.driver.get(url)
 
         if '淘宝' in self.driver.title:
@@ -277,6 +278,8 @@ class TBEngine:
         if products.first() is None:
             product = model(**info)
             product.save()
+            with open('TB_' + model.__name__ + '.json', 'a', encoding='utf-8') as json_file:
+                json_file.write(json.dumps(info) + ',\n')
         else:
             products.update(**info)
 

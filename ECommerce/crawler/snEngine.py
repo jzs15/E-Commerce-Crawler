@@ -264,11 +264,11 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     sd = SDEngine()
-    #sd.crawling('0-20002-')    #cellphone
-    #sd.crawling('0-244005-')   #refrigerator
-    #sd.crawling('0-258004-')   #laptop
-    #sd.crawling('0-258009-')   #desktop
-    #sd.crawling('0-293006-')   #television
+    sd.crawling('0-20002-')    #cellphone
+    sd.crawling('0-244005-')   #refrigerator
+    sd.crawling('0-258004-')   #laptop
+    sd.crawling('0-258009-')   #desktop
+    sd.crawling('0-293006-')   #television
     sd.crawling('0-244006-')   #washer
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
