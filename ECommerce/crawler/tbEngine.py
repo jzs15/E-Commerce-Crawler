@@ -48,11 +48,11 @@ class TBEngine:
                 elif '型号' in text:
                     product_info['model'] = text.split(':')[-1].strip()
             self.driver.execute_script("window.scrollTo(0, 800);")
-            time.sleep(2)
+            time.sleep(3)
             other_info = spider('tb')
-            time.sleep(2)
+            time.sleep(3)
             self.driver.find_element_by_xpath('//a[@shortcut-label="查看累计评论"]').click()
-            time.sleep(2)
+            time.sleep(3)
             good = int(self.driver.find_element_by_xpath('//span[@data-kg-rate-stats="good"]').text[1:-1])
             neutral = int(self.driver.find_element_by_xpath('//span[@data-kg-rate-stats="neutral"]').text[1:-1])
             bad = int(self.driver.find_element_by_xpath('//span[@data-kg-rate-stats="bad"]').text[1:-1])
@@ -63,7 +63,7 @@ class TBEngine:
             return {**product_info, **other_info}
         except WebDriverException:
             try:
-                time.sleep(2)
+                time.sleep(3)
                 self.driver.find_element_by_id('sufei-dialog-close').click()
             except ElementNotVisibleException:
                 pass
@@ -80,24 +80,24 @@ class TBEngine:
                 product_info['shop_name'] = self.driver.find_element_by_class_name('shopLink').text
             product_info['image'] = self.driver.find_element_by_id('J_ImgBooth').get_attribute('src')
             self.driver.execute_script("window.scrollTo(0, 800);")
-            time.sleep(2)
+            time.sleep(3)
             other_info = spider('tm')
             eval = self.driver.find_element_by_xpath('//a[@href="#J_Reviews"]')
             product_info['comment_num'] = int(eval.find_element_by_xpath('.//em').text)
             eval.click()
-            time.sleep(2)
+            time.sleep(3)
             product_info['score'] = float(self.driver.find_element_by_xpath('//div[@class="rate-score"]/strong').text)
             return {**product_info, **other_info}
         except WebDriverException:
             try:
-                time.sleep(2)
+                time.sleep(3)
                 self.driver.find_element_by_id('sufei-dialog-close').click()
             except ElementNotVisibleException:
                 pass
             return self.get_taobao_common(spider, True) if not retry else None
 
     def get_common_info(self, product_id, spider):
-        time.sleep(2)
+        time.sleep(3)
         url = 'https://item.taobao.com/item.htm?id={}'.format(product_id)
         base_info = {'url': url}
         self.driver.get(url)
@@ -248,7 +248,7 @@ class TBEngine:
                     self.driver.get(url + '&s=' + str(j * 44))
                     for k in range(1, 10):
                         self.driver.execute_script("window.scrollTo(0, " + str(k * 1000) + ");")
-                        time.sleep(0.5)
+                        time.sleep(1)
                     root = lxml.html.etree.HTML(self.driver.page_source)
                     elements = root.xpath('//div[@class="item g-clearfix"]')
                     ids = []
@@ -278,8 +278,6 @@ class TBEngine:
         if products.first() is None:
             product = model(**info)
             product.save()
-            with open('TB_' + model.__name__ + '.json', 'a', encoding='utf-8') as json_file:
-                json_file.write(json.dumps(info) + ',\n')
         else:
             products.update(**info)
 
@@ -291,27 +289,6 @@ class TBEngine:
         print('TAOBAO start')
         self.crawler('手机')
         print('TAOBAO end')
-
-
-def get_request(url, session, times=0):
-    if times >= 10:
-        print("Request failed: " + url)
-        return None
-    try:
-        header = {'User-Agent': 'Mozilla/5.0',
-                  'charset': 'utf-8'}
-        res = session.get(url, headers=header)
-        if res.status_code != 200:
-            time.sleep(3)
-            res = get_request(url, session, times + 1)
-    except ConnectionError:
-        try:
-            time.sleep(3)
-            res = get_request(url, session, times + 1)
-        except ConnectionError:
-            print("Request failed: " + url)
-            res = None
-    return res
 
 
 def main():

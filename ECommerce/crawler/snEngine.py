@@ -73,7 +73,6 @@ class SDEngine:
             ID_list = driver.find_element_by_id('product-list').find_elements_by_xpath(".//ul/li[@id]")
             for id in ID_list:
                 id_list.append(id.get_attribute('id').replace('-', '/'))
-        print('len =', len(id_list))
         return id_list
 
     def init_dict(self, m_dict, model):
@@ -112,8 +111,6 @@ class SDEngine:
         if products.first() is None:
             product = model(**m_dict)
             product.save()
-            with open(model.__name__ + '.json', 'a', encoding='utf-8') as json_file:
-                json_file.write(json.dumps(m_dict) + ',\n')
         else:
             products.update(**m_dict)
 
@@ -129,11 +126,11 @@ class SDEngine:
                 './/a').get_attribute('innerHTML')
         except:
             m_dict['shop_name'] = '苏宁自营'
-        # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        # time.sleep(5)
+        driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        time.sleep(2)
         driver.find_element_by_xpath('//li[@id="productCommTitle"]/a').click()
-        # time.sleep(5)
-        driver.implicitly_wait(5)
+        time.sleep(2)
+        driver.implicitly_wait(2)
         comment = driver.find_element_by_css_selector("[class='rv-place-item clearfix']")
         score = 5 * int(
             comment.find_element_by_xpath(".//li[@data-type='good']").get_attribute('data-num')) + 3 * int(
@@ -244,13 +241,9 @@ class SDEngine:
                 self.get_common_info(driver, info)
                 self.detail_info_crawler(driver, info, info_list_en, info_list_cn)
             except Exception as e:
-                print('exception')
                 continue
             if self.is_valid(info):
-                print('save')
                 self.save_to_db(info, model)
-            else:
-                print('no')
 
     @staticmethod
     def get_network_info(net):

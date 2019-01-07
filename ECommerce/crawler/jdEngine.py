@@ -319,8 +319,6 @@ class JDEngine:
         if products.first() is None:
             product = model(**info)
             product.save()
-            with open('JD_' + model.__name__ + '.json', 'a', encoding='utf-8') as json_file:
-                json_file.write(json.dumps(info) + ',\n')
         else:
             try:
                 products.update(**info)
