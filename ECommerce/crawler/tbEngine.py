@@ -112,7 +112,7 @@ class TBEngine:
                 return None
         else:
             try:
-                base_info['platform'] = '天猫'
+                base_info['platform'] = '淘宝'
                 product_info = self.get_tmall_common(spider)
                 if not product_info:
                     return None

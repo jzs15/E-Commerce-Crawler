@@ -649,8 +649,27 @@ def products_detail(request, product_id):
         category = '洗衣机'
     compare_list = compare_same_model(request, model, product_id)
 
+    common = request.GET.get('common')
+    url = request.get_full_path()
+    sorted_list = []
+    sort_list = {'price': ('价格', request.GET.get('price')), 'score': ('评分', request.GET.get('score')),
+                 'date': ('上市时间', request.GET.get('date')), 'comment_num': ('全网评论数', request.GET.get('comment_num'))}
+    if common is None:
+        for name, value in sort_list.items():
+            if value[1] is None:
+                continue
+            elif value[1] == 'up':
+                sorted_list.append((url.index(name), name))
+            else:
+                sorted_list.append((url.index(name), '-' + name))
+        sorted_list.sort(key=takeFirst)
+        sorted_list = [i[1] for i in sorted_list]
+        if len(sorted_list) > 0:
+            compare_list = compare_list.order_by(*sorted_list)
+
     return render(request, 'products_detail.html', {'product': product, 'detail_list': detail_list,
-                                                    'compare_list': compare_list, 'category': category})
+                                                    'compare_list': compare_list, 'category': category,
+                                                    'sort_list': sort_list, 'common': common})
 
 
 def compare_same_model(request, model, product_id):

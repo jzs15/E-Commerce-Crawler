@@ -9,6 +9,7 @@ import time
 from crawler.util import *
 import json
 
+
 class AZEngine:
     def __init__(self):
         self.isConnected = False

@@ -2,6 +2,7 @@ from app.models import *
 from mongoengine import *
 from ECommerce.settings import DATABASE_NAME
 import re
+import sys
 
 cellphone_brand_list = {
     '华为': ['华为', 'HUAWEI'],
@@ -46,7 +47,7 @@ os_list = {
 
 computer_os = ['家庭版', '家庭中文版', '中文版', '专业版', '家庭普通版', '试用版', '正版']
 
-etc_list = ['以官网信息为准', '--']
+etc_list = ['以官网信息为准', '以官方信息为准', '--']
 
 
 def change_etc(data):
@@ -63,7 +64,7 @@ def delete_model_name(model, std_list):
             model = re_v.sub('', model).strip()
     if model:
         if model[0] == '（':
-             model = model[1:].strip()
+            model = model[1:].strip()
         if model[0] == '）':
             model = model[1:].strip()
 
@@ -108,7 +109,7 @@ def remove_bracket(model):
     for i in range(num):
         index1 = model.find('(')
         index2 = model.find(')')
-        model = model[:index1] + model[index2+1:]
+        model = model[:index1] + model[index2 + 1:]
     return model
 
 
@@ -116,11 +117,11 @@ def change_os(os):
     for i in computer_os:
         if i in os:
             index = os.find(i)
-            os = os[:index] + os[index+len(i):]
+            os = os[:index] + os[index + len(i):]
             os = os.strip()
     if 'Win' in os and 'Windows' not in os:
         index = os.find('Win')
-        os = os[:index] + 'Windows' + os[index+3:]
+        os = os[:index] + 'Windows' + os[index + 3:]
     os = os.replace(' ', '', os.count(' '))
     return os
 
@@ -170,4 +171,5 @@ def standardization():
         product.save()
 
 
-standardization()
+if __name__ == '__main__':
+    sys.exit(standardization())

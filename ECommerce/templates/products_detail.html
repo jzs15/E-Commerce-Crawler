@@ -69,10 +69,47 @@
     </div>
     <div class="filter_mid">
         <table class="table detail_table">
+            <tr>
+                <td colspan="6">
+                    <div class="btn-group" role="group" aria-label="Basic example" data-toggle="buttons">
+                        {% if common is None %}
+                            <button onclick="AddFilter('common','true')" type="button"
+                                    class="btn btn-outline-info btn-sm">
+                                默认排序
+                            </button>
+                            {% for key, value in sort_list.items %}
+                                {% if value.1 == 'up' %}
+                                    <button onclick="AddFilter('{{ key }}','down')" type="button"
+                                            class="btn btn-outline-info btn-sm"
+                                            style="background-color: #17a2b8;color: #FFFFFF">{{ value.0 }}↑
+                                    </button>
+                                {% elif value.1 == 'down' %}
+                                    <button onclick="AddFilter('{{ key }}','up')" type="button"
+                                            class="btn btn-outline-info btn-sm"
+                                            style="background-color: #17a2b8;color: #FFFFFF">{{ value.0 }}↓
+                                    </button>
+                                {% else %}
+                                    <button onclick="AddFilter('{{ key }}','up')" type="button"
+                                            class="btn btn-outline-info btn-sm">{{ value.0 }}</button>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <button onclick="AddFilter('common','true')" type="button"
+                                    class="btn btn-outline-info btn-sm"
+                                    style="background-color: #17a2b8;color: #FFFFFF">默认排序
+                            </button>
+                            {% for key, value in sort_list.items %}
+                                <button onclick="AddFilter('{{ key }}','up')" type="button"
+                                        class="btn btn-outline-info btn-sm">{{ value.0 }}</button>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                </td>
+            </tr>
             {% for product in compare_list %}
                 <tr>
                     <td>
-                        <img src="{{ product.image }}" width="110px" alt="">
+                        <img src="{{ product.image }}" width="110px" height="110px" alt="">
                     </td>
                     <td>
                         <p><a href="{% url 'products_detail' product.id %}">{{ product.model }}</a></p>

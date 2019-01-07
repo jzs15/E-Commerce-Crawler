@@ -329,11 +329,11 @@ class JDEngine:
 
     def run(self):
         print('JINGDONG start')
-        self.crawler('9987,653,655')   #cellphone
-        self.crawler('737,794,878')   #refrigerator
-        self.crawler('670,671,672')   #laptop
-        self.crawler('670,671,673')   #desktop
-        self.crawler('737,794,798')   #television
+        self.crawler('9987,653,655')  # cellphone
+        self.crawler('737,794,878')  # refrigerator
+        self.crawler('670,671,672')  # laptop
+        self.crawler('670,671,673')  # desktop
+        self.crawler('737,794,798')  # television
         self.crawler('737,794,880')  # washer
         print('JINGDONG end')
 
@@ -367,7 +367,7 @@ def main():
     # jd.crawler('670,671,672') # 笔记本
     # jd.crawler('670,671,673') # 台式电脑
     # jd.crawler('737,794,798') # 电视
-    jd.crawler('737,794,880') # 洗衣机
+    jd.crawler('737,794,880')  # 洗衣机
     print("--- %s seconds ---" % (time.time() - start_time))
 
 

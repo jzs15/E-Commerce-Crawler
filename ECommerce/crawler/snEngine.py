@@ -15,18 +15,33 @@ class SDEngine:
     def __init__(self):
         self.is_connect = False
         self.common_info_list = ['image', 'title', 'shop_name', 'url', 'price', 'comment_num', 'score']
-        self.cellphone_info_list_en = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width', 'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
-        self.cellphone_info_list_cn = ['品牌', '型号', '上市时间', '手机操作系统', 'CPU品牌', '运行内存', '机身内存', '机身长度', '机身宽度', '机身厚度', '重量', '屏幕尺寸', '屏幕分辨率', '颜色', '4G网络制式']
-        self.refrigerator_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'weather', 'voltFre', 'rank', 'ability', 'method', 'dB', 'weight', 'cold_volume', 'ice_volume', 'form_size', 'case_size']
-        self.refrigerator_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '气候类型', '电压/频率', '国家能效等级', '冷冻能力', '制冷方式', '运转音dB(A)', '产品重量', '冷藏室容积', '冷冻室容积', '外形尺寸（宽*深*高）', '包装尺寸（宽*深*高）']
-        self.laptop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd', 'graphic_card', 'weight', 'frequency']
-        self.laptop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号', '重量', '屏幕分辨率']
-        self.desktop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd', 'graphic_card', 'weight']
-        self.desktop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号', '重量']
-        self.television_info_list_en = ['brand', 'model', 'tv_category', 'date', 'length', 'frequency', 'light', 'color', 'ratio', 'os', 'ram', 'rom', 'machine_power', 'wait_power', 'volt', 'size', 'weight']
-        self.television_info_list_cn = ['品牌', '产品型号', '电视类型', '上市时间', '屏幕尺寸', '屏幕分辨率', '光源类型', '产品颜色', '屏幕比例', '操作系统', 'RAM内存（DDR）', 'ROM存储（EMMC）', '整机功率（W）', '待机功率（W）', '电源电压', '单屏尺寸（宽*高*厚）', '单屏重量（KG）']
-        self.washer_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'drain_method', 'weight', 'wash_volume', 'dewater_volume', 'size', 'rank']
-        self.washer_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '排水方式', '产品重量', '洗衣容量', '脱水容量', '外形尺寸（宽*深*高）', '国家能效等级']
+        self.cellphone_info_list_en = ['brand', 'model', 'date', 'os', 'cpu', 'ram', 'rom', 'height', 'width',
+                                       'thickness', 'weight', 'screen_size', 'frequency', 'color', 'network_support']
+        self.cellphone_info_list_cn = ['品牌', '型号', '上市时间', '手机操作系统', 'CPU品牌', '运行内存', '机身内存', '机身长度', '机身宽度', '机身厚度',
+                                       '重量', '屏幕尺寸', '屏幕分辨率', '颜色', '4G网络制式']
+        self.refrigerator_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'weather', 'voltFre',
+                                          'rank', 'ability', 'method', 'dB', 'weight', 'cold_volume', 'ice_volume',
+                                          'form_size', 'case_size']
+        self.refrigerator_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '气候类型', '电压/频率', '国家能效等级', '冷冻能力', '制冷方式',
+                                          '运转音dB(A)', '产品重量', '冷藏室容积', '冷冻室容积', '外形尺寸（宽*深*高）', '包装尺寸（宽*深*高）']
+        self.laptop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd',
+                                    'graphic_card', 'weight', 'frequency']
+        self.laptop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号',
+                                    '重量', '屏幕分辨率']
+        self.desktop_info_list_en = ['brand', 'model', 'date', 'color', 'os', 'core', 'cpu', 'ram', 'ssd', 'hdd',
+                                     'graphic_card', 'weight']
+        self.desktop_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '操作系统', '核心数', 'CPU型号', '内存容量', '硬盘类型', '硬盘容量', '显卡型号',
+                                     '重量']
+        self.television_info_list_en = ['brand', 'model', 'tv_category', 'date', 'length', 'frequency', 'light',
+                                        'color', 'ratio', 'os', 'ram', 'rom', 'machine_power', 'wait_power', 'volt',
+                                        'size', 'weight']
+        self.television_info_list_cn = ['品牌', '产品型号', '电视类型', '上市时间', '屏幕尺寸', '屏幕分辨率', '光源类型', '产品颜色', '屏幕比例', '操作系统',
+                                        'RAM内存（DDR）', 'ROM存储（EMMC）', '整机功率（W）', '待机功率（W）', '电源电压', '单屏尺寸（宽*高*厚）',
+                                        '单屏重量（KG）']
+        self.washer_info_list_en = ['brand', 'model', 'date', 'color', 'open_method', 'drain_method', 'weight',
+                                    'wash_volume', 'dewater_volume', 'size', 'rank']
+        self.washer_info_list_cn = ['品牌', '型号', '上市时间', '颜色', '开门方式', '排水方式', '产品重量', '洗衣容量', '脱水容量', '外形尺寸（宽*深*高）',
+                                    '国家能效等级']
 
     @staticmethod
     def get_page_num(category):
@@ -34,7 +49,8 @@ class SDEngine:
         etree = lxml.html.etree
         root = etree.HTML(res.text)
         return int(root.xpath(
-            '//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[-1].attrib['pagenum'])
+            '//div[@id="product-wrap"]/div[@id="product-list"]/div[@id="bottom_pager"]/div[@class="search-page page-fruits clearfix"]/a[@pagenum]')[
+                       -1].attrib['pagenum'])
 
     def is_valid(self, m_dict):
         num = 0
@@ -105,17 +121,18 @@ class SDEngine:
     def get_common_info(driver, m_dict):
         infoMain = driver.find_element_by_class_name('proinfo-title')
         m_dict['image'] = driver.find_element_by_id('bigImg').find_element_by_xpath('.//img').get_attribute('src')
-        m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text.replace('自营', '').replace('\n', '')
+        m_dict['title'] = infoMain.find_element_by_xpath(".//h1[@id='itemDisplayName']").text.replace('自营', '').replace(
+            '\n', '')
         m_dict['price'] = float(driver.find_element_by_class_name('mainprice').text.replace('¥', ''))
         try:
             m_dict['shop_name'] = driver.find_element_by_class_name('header-shop-inline').find_element_by_xpath(
                 './/a').get_attribute('innerHTML')
         except:
             m_dict['shop_name'] = '苏宁自营'
-        #driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
-        #time.sleep(5)
+        # driver.execute_script("window.scrollTo(0, document.body.scrollHeight);")
+        # time.sleep(5)
         driver.find_element_by_xpath('//li[@id="productCommTitle"]/a').click()
-        #time.sleep(5)
+        # time.sleep(5)
         driver.implicitly_wait(5)
         comment = driver.find_element_by_css_selector("[class='rv-place-item clearfix']")
         score = 5 * int(
@@ -159,7 +176,7 @@ class SDEngine:
                     date = date.replace('-', '.', 3)
                 num = date.count('.')
                 if num == 2:
-                    index = date.index('.', date.index('.')+1)
+                    index = date.index('.', date.index('.') + 1)
                     date = date[:index]
                     index = date.index('.')
                     if len(date) - index < 3:
@@ -252,11 +269,11 @@ class SDEngine:
 
     def run(self):
         print('SUNING start')
-        self.crawling('0-20002-')    #cellphone
-        self.crawling('0-244005-')   #refrigerator
-        self.crawling('0-258004-')   #laptop
-        self.crawling('0-258009-')   #desktop
-        self.crawling('0-293006-')   #television
+        self.crawling('0-20002-')  # cellphone
+        self.crawling('0-244005-')  # refrigerator
+        self.crawling('0-258004-')  # laptop
+        self.crawling('0-258009-')  # desktop
+        self.crawling('0-293006-')  # television
         self.crawling('0-244006-')  # washer
         print('SUNING end')
 
@@ -264,12 +281,12 @@ class SDEngine:
 def main():
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
     sd = SDEngine()
-    sd.crawling('0-20002-')    #cellphone
-    sd.crawling('0-244005-')   #refrigerator
-    sd.crawling('0-258004-')   #laptop
-    sd.crawling('0-258009-')   #desktop
-    sd.crawling('0-293006-')   #television
-    sd.crawling('0-244006-')   #washer
+    sd.crawling('0-20002-')  # cellphone
+    sd.crawling('0-244005-')  # refrigerator
+    sd.crawling('0-258004-')  # laptop
+    sd.crawling('0-258009-')  # desktop
+    sd.crawling('0-293006-')  # television
+    sd.crawling('0-244006-')  # washer
     print(time.strftime("%Y-%m-%d %H:%M:%S", time.localtime()))
 
 

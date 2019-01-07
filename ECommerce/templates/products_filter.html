@@ -120,7 +120,7 @@
             {% for product in products.object_list %}
                 <tr>
                     <td>
-                        <img src="{{ product.image }}" width="160px" alt="">
+                        <img src="{{ product.image }}" width="160px" height="160px" alt="">
                     </td>
                     <td>
                         <p><a href="{% url 'products_detail' product.id %}">{{ product.model|safe }}</a></p>
